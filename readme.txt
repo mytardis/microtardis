@@ -1,3 +1,7 @@
 To do:
-- Add CoreTardis trunk
-- Check unit test
+- Check all unit tests
+
+
+11/7/2011
+=========
+- Added CoreTardis trunk

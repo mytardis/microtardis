@@ -1,0 +1,28 @@
+<script type="text/javascript"> 
+$(document).ready(function() {
+	if(!FlashDetect.installed){
+		$("#flash").hide();
+	}
+	else
+	{
+		$("#noflash").hide();
+	}
+});
+</script>
+{% load uploadify_tags %}
+<div class="upload_files_box">
+  <div id="flash">
+  <b>Upload Files To Dataset</b>
+  <br/>
+  <br/>
+  {% multi_file_upload upload_complete_url dataset_id %}
+  <br/>
+  <strong><a id="upload_go" href="javascript:$('#fileInput').uploadifyUpload();">Upload Now</a></strong>
+  <br/>
+  </div>
+  <div id="noflash">
+	Flash is required to upload files to a dataset.
+  </div>	
+</div> <!-- upload_files box -->
+
+<br/>
