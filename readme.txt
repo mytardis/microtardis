@@ -5,3 +5,4 @@ To do:
 11/7/2011
 =========
 - Added CoreTardis trunk
+- Linked the repository to JIRA
