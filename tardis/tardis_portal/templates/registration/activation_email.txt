@@ -1,0 +1,1 @@
+Thanks for signing up to {{ site }}. Use this link to activate your registration: {{ site }}/accounts/activate/{{ activation_key }}/
