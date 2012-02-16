@@ -29,6 +29,13 @@ tmp.append(
 )
 TEMPLATE_DIRS = tuple(tmp)
 
+# Add Middleware
+tmp = list(MIDDLEWARE_CLASSES)
+tmp.append(
+    'tardis.tardis_portal.filters.FilterInitMiddleware'
+)
+MIDDLEWARE_CLASSES = tuple(tmp)
+
 # Post Save Filters
 POST_SAVE_FILTERS = [
     ("tardis.apps.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://rmmf.isis.rmit.edu.au/schemas"]),
