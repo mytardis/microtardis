@@ -11,72 +11,13 @@
     <title>MicroTARDIS {% if subtitle %}- {{ subtitle }} {% endif %}</title>
     
     <!-- CSS Styles -->
-    <link href="/site_media/css/default.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="{{STATIC_URL}}/css/default.css" rel="stylesheet" type="text/css" media="screen">
     <link href="/static/css/microtardis.css" rel="stylesheet" type="text/css" media="screen">
 
     <!-- Javascript -->
     {% include "tardis_portal/javascript_libraries.html" %}
     {% block script %}
     {% endblock script %}
-    
-    <script type="text/javascript">
-    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
-
-    <script type="text/javascript">
-    try {
-        var pageTracker = _gat._getTracker("UA-5443750-1");
-        pageTracker._trackPageview();
-    } catch(err) {}
-    </script>
-
-    <script type="text/javascript">
-	$(document).ready(function(){
-	    var users = (function () {
-	        var val = null;
-	        var authMethod = "localdb";
-	        var data = { authMethod: authMethod };
-	        $.ajax({
-	            'async': false,
-	            'global': false,
-	            'data': data,
-	            'url': '/ajax/parameter_field_list',
-	            'success': function (data) {
-	                val = data;
-	            }
-	        });
-	        return val;
-	    })();
-	  
-	    $("#id_q").autocomplete(users.split(" "), {
-	        matchContains: true, multiple: true, multipleSeparator: " "
-	    });	
-	});
-    </script>
-
-    <script type="text/javascript">
-    $(document).ready(function() {
-        var myClose=function(hash) {
-                hash.w.fadeOut('2000',function(){ hash.o.remove()});
-                window.location.hash = "";
-            };
-        $("#jqmAlertStatus").jqm({modal: false, overlay: 1,onHide:myClose});
-        {% if status %}
-        $('#jqmAlertStatus').jqmShow();
-        {% endif %}
-        // $("#fuzz").fadeIn();
-        if(window.location.hash) {
-            if(window.location.hash == '#created') {
-                $('#jqmStatusMessage').html('Experiment Created');
-                $("#jqmAlertStatus").jqmShow();
-            } else if(window.location.hash == '#saved') {
-                $('#jqmStatusMessage').html('Experiment Saved');
-                $("#jqmAlertStatus").jqmShow();                 
-            }
-        }       
-    });         
-    </script>
 
 </head>
 
@@ -99,7 +40,6 @@
 	            <li><a href="{% url tardis.tardis_portal.views.index %}">Home</a></li>
 	            <li><a href="{% url tardis.tardis_portal.views.about %}">About</a></li>
 	            <li><a href="{% url tardis.tardis_portal.views.experiment_index %}">Data</a></li>
-	            <li><a href="{% url tardis.tardis_portal.views.partners %}">Partners</a></li>
 	            <li><a href="{% url tardis.tardis_portal.views.stats %}">Stats</a></li>
             </ul>
         </div>
@@ -113,7 +53,11 @@
 	            {% if is_superuser %}
 	                <a href="{% url admin:index %}"><em>{{ username }}</em></a>
 	            {% else %}
-	                <em>{{ username }}</em>
+                    {% if is_token_user %}
+                        <em class="token_user">{{ username }}</em>
+                    {% else %}
+                        <em>{{ username }}</em>
+                    {% endif %}
 	            {% endif %}
 	            - <a href="{% url django.contrib.auth.views.logout %}"> [Log Out]</a>
 	        {% else %}
@@ -122,18 +66,20 @@
 	        {% endif %}
 	    </div> 
 	    
-	    {% if form %}
-		    <div class="searchmenu" style="float: right">
-		        <form method="get" action="{% url tardis.tardis_portal.views.single_search %}">
-			        <table>
-				        <tr>
-				            <td><input type="submit" value="search"/></td>
-				            <td><input type="text" name="q" id="id_q"{% if query %} value="{{ query }}"{% endif %} /></td>
-				        </tr>
-			        </table>
-		        </form>
-		    </div>
-	    {% endif %}
+        {% if search_form %}
+            <div class="search-bar">
+                <div class="search-bar-wrapper clearfix">
+                    <form method="get" action="{% url tardis.tardis_portal.views.single_search %}">
+                        <div class="search-text-wrapper">
+                            <input type="text" name="q" id="id_q" placeholder="Enter EPN, author, beamline etc."{% if search_query %} value="{{ search_query }}"{% endif %} />
+                        </div> <!-- search-text-wrapper -->
+                        <div class="search-submit-wrapper">
+                            <input type="submit" id="search_btn" value="Search"/>
+                        </div><!-- search-submit-wrapper -->
+                    </form>
+                </div> <!-- search-menu-wrapper -->
+            </div> <!-- search-menu-bar -->
+        {% endif %}
     </div>
 
     <!-- page -->   
@@ -141,17 +87,10 @@
         <div id="content-box">
             <div class="jqmAlertStatus" id="jqmAlertStatus">
                 <div class="jqmAlertWindowStatus">
-                    {% if error %}
-	                    <div class="jqmAlertContentStatus" id="jqmAlertContentStatus">
-	                        <a href="#" class="jqmClose"></a>
-	                        <br/>{{status}}
-	                    </div>
-                    {% else %}
 	                    <div class="jqmAlertContentStatus" id="jqmAlertContentStatus">
 	                        <a href="#" class="jqmClose"></a>
 	                        <br/><span id="jqmStatusMessage">{{status}}</span>
 	                    </div>
-                    {% endif %}
                  </div> 
             </div> 
             {% block content %}
