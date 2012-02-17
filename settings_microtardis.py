@@ -4,6 +4,9 @@ from tardis.settings_changeme import *
 # Debug mode
 DEBUG = False
 
+# Test Runner Configuration
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
 # Database settings
 DATABASES = {
     'default': {
