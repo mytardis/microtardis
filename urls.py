@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import patterns
-from tardis.urls import urlpatterns as tardisurls
+#from tardis.urls import urlpatterns as tardisurls
 from django.conf import settings
 
 # Use the new views in MicroTardis
