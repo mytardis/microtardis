@@ -1,3 +1,5 @@
+from tardis.test_settings import *
+
 # --------------------------------------
 # -- MicroTardis settings for testing --
 # --------------------------------------
