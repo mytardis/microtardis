@@ -23,4 +23,4 @@ urlpatterns += patterns('tardis.tardis_portal.views',
 )
 
 # Include all the URL patterns in MyTardis
-urlpatterns += tardisurls
+#urlpatterns += tardisurls

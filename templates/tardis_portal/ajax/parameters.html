@@ -29,7 +29,7 @@
 		    <tr>
                 <td class="parameter_value">
                     <a class="showFullImage{{ datafile_id }}" href="{% url tardis.apps.microtardis.views.direct_to_thumbnail_html datafile_id 'tif' %}">
-                        <img border="0" src="{{ thumbpath }}" onerror="this.style.display = 'none'"> 
+                        <img border="0" src="/apps/microtardis{{ thumbpath }}" onerror="this.style.display = 'none'"> 
                     </a>
                     
                   
@@ -68,7 +68,7 @@
             <tr>
                 <td class="parameter_value">
                     <a class="showFullImage{{ datafile_id }}" href="{% url tardis.apps.microtardis.views.direct_to_thumbnail_html datafile_id 'spc' %}">
-                        <img border="0" src="/spectra_png/small/{{ datafile_id }}/" onerror="this.style.display = 'none'"> 
+                        <img border="0" src="/apps/microtardis/spectra_png/small/{{ datafile_id }}/" onerror="this.style.display = 'none'"> 
                     </a>
                     
                   
