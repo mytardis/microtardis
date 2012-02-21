@@ -61,6 +61,11 @@ Select: <a class="dataset_selector_all clickable">[All]</a> / <a class="dataset_
         <span class="ui-icon ui-icon-circle-triangle-e"></span>
         Show/Hide
     </a>
+    {% if datafile.filename|slice:"-4:" == ".spc" or datafile.filename|slice:"-4:" == ".spt" %}
+        <a class="filelink" href="/apps/microtardis/spectra_csv/{{ datafile.id }}">
+            <img border="0" src="/static/img/csv.png">
+        </a>
+    {% endif %}
     <div style="clear:both;"></div>
     <ul class="datafile_info" style="display:none;">
     </ul>
