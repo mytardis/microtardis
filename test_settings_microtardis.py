@@ -15,6 +15,7 @@ MIDDLEWARE_CLASSES = tuple(tmp)
 POST_SAVE_FILTERS = [
     ("tardis.apps.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://rmmf.isis.rmit.edu.au/schemas"]),
     ("tardis.apps.microtardis.filters.spctags.make_filter", ["EDAXGenesis_SPC","http://rmmf.isis.rmit.edu.au/schemas"]),
+    ("tardis.apps.microtardis.filters.dattags.make_filter", ["HKLEDSD_DAT","http://rmmf.isis.rmit.edu.au/schemas"]),
     ]
 
 # Directory path for image thumbnails
