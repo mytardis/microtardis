@@ -103,13 +103,15 @@ def retrieve_parameters(request, dataset_file_id):
             parametersets[parameterset.schema] = parameters
     
     thumbpath = None
-    spc_file = False
+    file_type = False
     qs = Dataset_File.objects.filter(id=dataset_file_id)
     if qs:
         datafile = qs[0]
-        # .spc image
-        if datafile.mimetype == "application/octet-stream":
-            spc_file = True
+        # for showing spectra image
+        if str(datafile.filename)[-4:] == ".spc":
+            file_type = "spc"
+        elif str(datafile.filename)[-4:] == ".spt":
+            file_type = "spt"
         # .tif thumbnail image
         elif datafile.mimetype == "image/tiff":
             basepath = "/thumbnails/small"
@@ -118,7 +120,7 @@ def retrieve_parameters(request, dataset_file_id):
 
     c = Context({'parametersets': parametersets,
                  'thumbpath': thumbpath,
-                 'spc_file': spc_file,
+                 'file_type': file_type,
                  'datafile_id': dataset_file_id})
 
     return HttpResponse(render_response_index(request,
@@ -248,10 +250,13 @@ def get_spectra_json(request, datafile_id):
     
     return response
 
-def get_spectra_png(request, size, datafile_id):
+def get_spectra_png(request, size, datafile_id, datafile_type):
     if is_matplotlib_imported:
         datafile = Dataset_File.objects.get(pk=datafile_id)
-        values = list( get_spc_spectra(datafile) )
+        if datafile_type == 'spc':
+            values = list( get_spc_spectra(datafile) )
+        elif datafile_type == 'spt':
+            values = list( get_spt_spectra(datafile) )
         # truncate the values on x axis
         nonzero_values = numpy.nonzero(values)
         for i in range(0, len(nonzero_values[0])+1, 1):
