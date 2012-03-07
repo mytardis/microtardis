@@ -56,13 +56,16 @@ Select: <a class="dataset_selector_all clickable">[All]</a> / <a class="dataset_
         Add
      </a>
      {% endif %}
-
+<!-- microtardis change start -->
     <a id="datafile_metadata_toggle_{{datafile.id}}" title="Show/Hide" class="datafile_info_toggle metadata_hidden fg-button small ui-state-default fg-button-icon-solo ui-corner-all" href="/apps/microtardis/ajax/parameters/{{ datafile.id}}/">
+<!-- microtardis change end -->
         <span class="ui-icon ui-icon-circle-triangle-e"></span>
         Show/Hide
     </a>
     {% if datafile.filename|slice:"-4:" == ".spc" or datafile.filename|slice:"-4:" == ".spt" %}
+<!-- microtardis change start -->
         <a class="filelink" href="/apps/microtardis/spectra_csv/{{ datafile.id }}" title="Download Spectrum">
+<!-- microtardis change end -->
             <img border="0" src="/static/img/csv.png">
         </a>
     {% endif %}

@@ -239,6 +239,13 @@ ul {
     float: left;
 }
 
+/*************/
+/* Download  */
+/*************/
+.download_entire_experiment {
+    text-align: left;
+}
+
 /* Status box on front page: it's an iframe which contains a page containing a div. The contents of the iframe
  * links back to this stylesheet. */
 iframe {
