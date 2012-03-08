@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from tardis.apps.microtardis.models import Experiment_Hidden
-from tardis.apps.microtardis.models import Dataset_Hidden
-from tardis.apps.microtardis.models import Datafile_Hidden
-from tardis.apps.microtardis.models import Dataset_Harvest
-from tardis.apps.microtardis.models import Datafile_Harvest
+from tardis.microtardis.models import Experiment_Hidden
+from tardis.microtardis.models import Dataset_Hidden
+from tardis.microtardis.models import Datafile_Hidden
+from tardis.microtardis.models import Dataset_Harvest
+from tardis.microtardis.models import Datafile_Harvest
 
 class Experiment_Hidden_Admin(admin.ModelAdmin):
     list_display = ('experiment', 'hidden',)

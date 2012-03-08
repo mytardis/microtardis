@@ -8,10 +8,12 @@ import numpy
 
 from django.template import Context
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.utils import simplejson as json
 from django.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
 
 from tardis.tardis_portal.auth import decorators as authz
 from tardis.tardis_portal.shortcuts import render_response_index
@@ -22,6 +24,12 @@ from tardis.tardis_portal.models import DatafileParameterSet
 from tardis.tardis_portal.models import Schema
 from tardis.tardis_portal.models import Dataset
 from tardis.tardis_portal.models import Dataset_File
+
+from tardis.microtardis.models import Experiment_Hidden
+from tardis.microtardis.models import Dataset_Hidden
+from tardis.microtardis.models import Datafile_Hidden
+from tardis.microtardis.models import Dataset_Harvest
+from tardis.microtardis.models import Datafile_Harvest
 
 # import and configure matplotlib library
 try:
@@ -322,4 +330,46 @@ def get_spectra_png(request, size, datafile_id, datafile_type):
         buffer = StringIO.StringIO()
         return HttpResponse(buffer.getvalue(), mimetype='image/png')
     
+def hide_objects(request):
+    expid = request.POST['expid']
+    datasets = []
+    if 'dataset' in request.POST:
+        datasets = request.POST.getlist('dataset')
+        for dataset in datasets:
+            Dataset_Hidden.objects.filter(dataset=dataset).update(hidden=True)
+            for datafile in Dataset_File.objects.filter(dataset=dataset):
+                if authz.has_datafile_access(request, datafile.id):
+                    Datafile_Hidden.objects.filter(datafile=datafile.id).update(hidden=True)
 
+    if 'datafile' in request.POST:
+        datafiles = request.POST.getlist('datafile')
+        for datafile in datafiles:
+            datafile = Dataset_File.objects.get(pk=datafile)
+            if datafile.dataset.id in datasets:
+                continue
+            if authz.has_datafile_access(request, datafile.id):
+                Datafile_Hidden.objects.filter(datafile=datafile.id).update(hidden=True)
+                
+    return HttpResponseRedirect(reverse('tardis.tardis_portal.views.view_experiment', args=(expid,)))
+
+def unhide_objects(request):
+    expid = request.POST['expid']
+    datasets = []
+    if 'dataset' in request.POST:
+        datasets = request.POST.getlist('dataset')
+        for dataset in datasets:
+            Dataset_Hidden.objects.filter(dataset=dataset).update(hidden=False)
+            for datafile in Dataset_File.objects.filter(dataset=dataset):
+                if authz.has_datafile_access(request, datafile.id):
+                    Datafile_Hidden.objects.filter(datafile=datafile.id).update(hidden=False)
+
+    if 'datafile' in request.POST:
+        datafiles = request.POST.getlist('datafile')
+        for datafile in datafiles:
+            datafile = Dataset_File.objects.get(pk=datafile)
+            if datafile.dataset.id in datasets:
+                continue
+            if authz.has_datafile_access(request, datafile.id):
+                Datafile_Hidden.objects.filter(datafile=datafile.id).update(hidden=False)
+                
+    return HttpResponseRedirect(reverse('tardis.tardis_portal.views.view_experiment', args=(expid,)))
