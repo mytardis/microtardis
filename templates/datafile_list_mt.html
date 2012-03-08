@@ -2,6 +2,6 @@
 
 {% block extra_links %}
     {% if datafile.filename|slice:"-4:" == ".spc" or datafile.filename|slice:"-4:" == ".spt" %}
-        <a class="filelink" href="/apps/microtardis/spectra_csv/{{ datafile.id }}">[Spectra in CSV]</a>
+        <a class="filelink" href="/microtardis/spectra_csv/{{ datafile.id }}">[Spectra in CSV]</a>
     {% endif %}
 {% endblock extra_links %}

@@ -65,7 +65,7 @@ class EXIFTagsTestCase(TestCase):
     def test_save_metadata(self):
         from os import path
         try:
-            from tardis.apps.microtardis.filters.exiftags import EXIFTagsFilter
+            from tardis.microtardis.filters.exiftags import EXIFTagsFilter
         except:
             raise SkipTest()
 
@@ -151,7 +151,7 @@ class SPCTagsTestCase(TestCase):
     def test_save_metadata(self):
         from os import path
         try:
-            from tardis.apps.microtardis.filters.spctags import SPCTagsFilter
+            from tardis.microtardis.filters.spctags import SPCTagsFilter
         except:
             raise SkipTest()
 

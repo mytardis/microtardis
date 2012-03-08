@@ -50,14 +50,14 @@ from django.conf import settings
 
 from tardis.tardis_portal.models import Schema, DatafileParameterSet
 from tardis.tardis_portal.models import ParameterName, DatafileParameter
-from tardis.apps.microtardis.views import write_thumbnails
+from tardis.microtardis.views import write_thumbnails
 
 from fractions import Fraction
 
 
 logger = logging.getLogger(__name__)
 try:
-    import tardis.apps.microtardis.filters.lib.sourceforge.exif_py.EXIF as EXIF
+    import tardis.microtardis.filters.lib.sourceforge.exif_py.EXIF as EXIF
 except ImportError:
     import sys
     logger.debug("Error: Can't find the file 'EXIF.py' in the directory containing %r" % __file__)

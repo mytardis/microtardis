@@ -22,13 +22,13 @@ DATABASES = {
 }
 
 # Root URLs in MicroTardis
-ROOT_URLCONF = 'tardis.urls'
+ROOT_URLCONF = 'tardis.microtardis.urls'
 
 # extend template directory to TEMPLATE_DIRS
 tmp = list(TEMPLATE_DIRS)
 tmp.append(
     path.join(path.dirname(__file__),
-    'apps/microtardis/templates/').replace('\\', '/')
+    'microtardis/templates/').replace('\\', '/')
 )
 TEMPLATE_DIRS = tuple(tmp)
 
@@ -41,9 +41,9 @@ MIDDLEWARE_CLASSES = tuple(tmp)
 
 # Post Save Filters
 POST_SAVE_FILTERS = [
-    ("tardis.apps.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://rmmf.isis.rmit.edu.au/schemas"]),
-    ("tardis.apps.microtardis.filters.spctags.make_filter", ["EDAXGenesis_SPC","http://rmmf.isis.rmit.edu.au/schemas"]),
-    ("tardis.apps.microtardis.filters.dattags.make_filter", ["HKLEDSD_DAT","http://rmmf.isis.rmit.edu.au/schemas"]),
+    ("tardis.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://rmmf.isis.rmit.edu.au/schemas"]),
+    ("tardis.microtardis.filters.spctags.make_filter", ["EDAXGenesis_SPC","http://rmmf.isis.rmit.edu.au/schemas"]),
+    ("tardis.microtardis.filters.dattags.make_filter", ["HKLEDSD_DAT","http://rmmf.isis.rmit.edu.au/schemas"]),
     ]
 
 # Log files
@@ -58,9 +58,9 @@ THUMBNAILS_PATH = path.abspath(path.join(path.dirname(__file__),
     '../var/thumbnails/')).replace('\\', '/')
 
 # Template loaders
-INSTALLED_APPS = (TARDIS_APP_ROOT+".microtardis",) + INSTALLED_APPS
+INSTALLED_APPS = ("tardis.microtardis",) + INSTALLED_APPS
 TEMPLATE_LOADERS = (
-    'tardis.apps.microtardis.templates.loaders.app_specific.Loader',
+    'tardis.microtardis.templates.loaders.app_specific.Loader',
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.filesystem.Loader',
 )
@@ -68,7 +68,7 @@ TEMPLATE_LOADERS = (
 # Microtardis Media
 MT_STATIC_URL_ROOT = '/static'
 MT_STATIC_DOC_ROOT = path.join(path.dirname(__file__),
-                               'apps/microtardis/static').replace('\\', '/')
+                               'microtardis/static').replace('\\', '/')
 
 # smatplotlib module configuration                               
 MATPLOTLIB_HOME = path.abspath(path.join(path.dirname(__file__), 

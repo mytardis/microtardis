@@ -28,8 +28,8 @@
                 <tr><th class="schema_name" title="Preview Image" colspan="2">Preview Image</th></tr>
                 <tr>
                     <td class="parameter_value">
-                        <a class="showFullImage{{ datafile_id }}" href="{% url tardis.apps.microtardis.views.direct_to_thumbnail_html datafile_id 'tif' %}">
-                            <img border="0" src="/apps/microtardis{{ thumbpath }}" onerror="this.style.display = 'none'"> 
+                        <a class="showFullImage{{ datafile_id }}" href="{% url tardis.microtardis.views.direct_to_thumbnail_html datafile_id 'tif' %}">
+                            <img border="0" src="/microtardis{{ thumbpath }}" onerror="this.style.display = 'none'"> 
                         </a>
                         
                       
@@ -67,8 +67,8 @@
                 <tr><th class="schema_name" title="Preview Image" colspan="2">Preview Image</th></tr>
                 <tr>
                     <td class="parameter_value">
-                        <a class="showFullImage{{ datafile_id }}" href="{% url tardis.apps.microtardis.views.direct_to_thumbnail_html datafile_id 'spc' %}">
-                            <img border="0" src="/apps/microtardis/spectra_png/small/{{ datafile_id }}/spc/" onerror="this.style.display = 'none'"> 
+                        <a class="showFullImage{{ datafile_id }}" href="{% url tardis.microtardis.views.direct_to_thumbnail_html datafile_id 'spc' %}">
+                            <img border="0" src="/microtardis/spectra_png/small/{{ datafile_id }}/spc/" onerror="this.style.display = 'none'"> 
                         </a>
                         
                       
@@ -126,8 +126,8 @@
                     <tr><th class="schema_name" title="Preview Image" colspan="2">Preview Image</th></tr>
                     <tr>
                         <td class="parameter_value">
-                            <a class="showFullImage{{ datafile_id }}" href="{% url tardis.apps.microtardis.views.direct_to_thumbnail_html datafile_id 'spt' %}">
-                                <img border="0" src="/apps/microtardis/spectra_png/small/{{ datafile_id }}/spt/" onerror="this.style.display = 'none'"> 
+                            <a class="showFullImage{{ datafile_id }}" href="{% url tardis.microtardis.views.direct_to_thumbnail_html datafile_id 'spt' %}">
+                                <img border="0" src="/microtardis/spectra_png/small/{{ datafile_id }}/spt/" onerror="this.style.display = 'none'"> 
                             </a>
                             
                           
