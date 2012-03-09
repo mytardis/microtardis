@@ -1,0 +1,16 @@
+ {% extends "tardis_portal:tardis_portal/ajax/experiment_description.html" %}
+ 
+  {% block dataset_info %}
+  <p>
+    <strong>Dataset Information:</strong>
+    <div>
+      <div class="dataset_information">
+            <ul>
+              <li><strong>Datasets:</strong> {{datasets.count}}</li>
+              <li><strong>Files:</strong> {{datafiles.count}}</li>
+              <li><strong>Size:</strong> {{size|filesizeformat}}</li>
+            </ul>
+      </div>
+    </div>
+  </p>
+  {% endblock dataset_info %}

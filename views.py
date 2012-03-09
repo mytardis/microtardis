@@ -14,16 +14,28 @@ from django.conf import settings
 from django.utils import simplejson as json
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+# for experiment_description
+from django.contrib.auth.models import User
+# for retrieve_datafile_list
+from django.core.paginator import Paginator
+from urllib import urlencode
 
 from tardis.tardis_portal.auth import decorators as authz
 from tardis.tardis_portal.shortcuts import render_response_index
 from tardis.tardis_portal.staging import add_datafile_to_dataset
 from tardis.tardis_portal.staging import write_uploaded_file_to_dataset
+# for experiment_description
+from tardis.tardis_portal.auth.localdb_auth import django_user
+# for experiment_datasets
+from tardis.tardis_portal.views import getNewSearchDatafileSelectionForm
 
 from tardis.tardis_portal.models import DatafileParameterSet
 from tardis.tardis_portal.models import Schema
 from tardis.tardis_portal.models import Dataset
 from tardis.tardis_portal.models import Dataset_File
+# for experiment_description
+from tardis.tardis_portal.models import Experiment
+from tardis.tardis_portal.models import ExperimentACL
 
 from tardis.microtardis.models import Experiment_Hidden
 from tardis.microtardis.models import Dataset_Hidden
@@ -40,7 +52,7 @@ try:
     is_matplotlib_imported = True
 except ImportError:
     is_matplotlib_imported = False
-        
+    
 
 @never_cache
 @authz.datafile_access_required
@@ -133,6 +145,275 @@ def retrieve_parameters(request, dataset_file_id):
 
     return HttpResponse(render_response_index(request,
                         'tardis_portal/ajax/parameters.html', c))
+
+
+
+
+
+@authz.experiment_access_required
+def experiment_description(request, experiment_id):
+    """View an existing experiment's description. To be loaded via ajax.
+
+    :param request: a HTTP Request instance
+    :type request: :class:`django.http.HttpRequest`
+    :param experiment_id: the ID of the experiment to be edited
+    :type experiment_id: string
+    :rtype: :class:`django.http.HttpResponse`
+
+    """
+    c = Context({})
+
+    try:
+        experiment = Experiment.safe.get(request, experiment_id)
+    except PermissionDenied:
+        return return_response_error(request)
+    except Experiment.DoesNotExist:
+        return return_response_not_found(request)
+
+    c['experiment'] = experiment
+    c['subtitle'] = experiment.title
+    c['nav'] = [{'name': 'Data', 'link': '/experiment/view/'},
+                {'name': experiment.title,
+                 'link': experiment.get_absolute_url()}]
+
+    c['authors'] = experiment.author_experiment_set.all()
+
+    # microtardis change start
+    unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
+    c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
+    unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+    c['datafiles'] = Dataset_File.objects.filter(dataset__experiment=experiment_id, pk__in=unhidden_datafiles)
+    # microtardis change end
+
+    acl = ExperimentACL.objects.filter(pluginId=django_user,
+                                       experiment=experiment,
+                                       isOwner=True)
+
+    # TODO: resolve usernames through UserProvider!
+    # Right now there are exceptions every time for ldap users..
+    c['owners'] = []
+    for a in acl:
+        try:
+            c['owners'].append(User.objects.get(pk=str(a.entityId)))
+        except User.DoesNotExist:
+            #logger.exception('user for acl %i does not exist' % a.id)
+            pass
+
+    # calculate the sum of the datafile sizes
+    size = 0
+    for df in c['datafiles']:
+        try:
+            size = size + long(df.size)
+        except:
+            pass
+    c['size'] = size
+
+    c['has_read_or_owner_ACL'] = \
+        authz.has_read_or_owner_ACL(request, experiment_id)
+
+    c['has_write_permissions'] = \
+        authz.has_write_permissions(request, experiment_id)
+
+    if request.user.is_authenticated():
+        c['is_owner'] = authz.has_experiment_ownership(request, experiment_id)
+
+    c['protocol'] = []
+    download_urls = experiment.get_download_urls()
+    for key, value in download_urls.iteritems():
+        c['protocol'] += [[key, value]]
+
+    if 'status' in request.GET:
+        c['status'] = request.GET['status']
+    if 'error' in request.GET:
+        c['error'] = request.GET['error']
+
+    return HttpResponse(render_response_index(request,
+                        'tardis_portal/ajax/experiment_description.html', c))
+
+
+@never_cache
+@authz.experiment_access_required
+def experiment_datasets(request, experiment_id):
+
+    """View a listing of dataset of an existing experiment as ajax loaded tab.
+
+    :param request: a HTTP Request instance
+    :type request: :class:`django.http.HttpRequest`
+    :param experiment_id: the ID of the experiment to be edited
+    :type experiment_id: string
+    :param template_name: the path of the template to render
+    :type template_name: string
+    :rtype: :class:`django.http.HttpResponse`
+
+    """
+    c = Context({'upload_complete_url':
+                     reverse('tardis.tardis_portal.views.upload_complete'),
+                 'searchDatafileSelectionForm':
+                     getNewSearchDatafileSelectionForm(),
+                 })
+
+    try:
+        experiment = Experiment.safe.get(request, experiment_id)
+    except PermissionDenied:
+        return return_response_error(request)
+    except Experiment.DoesNotExist:
+        return return_response_not_found(request)
+
+    c['experiment'] = experiment
+    if 'query' in request.GET:
+
+        # We've been passed a query to get back highlighted results.
+        # Only pass back matching datafiles
+        #
+        search_query = FacetFixedSearchQuery(backend=HighlightSearchBackend())
+        sqs = SearchQuerySet(query=search_query)
+        query = SearchQueryString(request.GET['query'])
+        facet_counts = sqs.raw_search(query.query_string() + ' AND experiment_id_stored:%i' % (int(experiment_id)), end_offset=1).facet('dataset_id_stored').highlight().facet_counts()
+        if facet_counts:
+            dataset_id_facets = facet_counts['fields']['dataset_id_stored']
+        else:
+            dataset_id_facets = []
+
+        c['highlighted_datasets'] = [ int(f[0]) for f in dataset_id_facets ]
+        c['file_matched_datasets'] = []
+        c['search_query'] = query
+
+        # replace '+'s with spaces
+    elif 'datafileResults' in request.session and 'search' in request.GET:
+        c['highlighted_datasets'] = None
+        c['highlighted_dataset_files'] = [r.pk for r in request.session['datafileResults']]
+        c['file_matched_datasets'] = \
+            list(set(r.dataset.pk for r in request.session['datafileResults']))
+        c['search'] = True
+
+    else:
+        c['highlighted_datasets'] = None
+        c['highlighted_dataset_files'] = None
+        c['file_matched_datasets'] = None
+
+    # microtardis change start
+    unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
+    c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
+    unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+    datafiles = {}
+    for dataset in c['datasets']:
+        datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id, pk__in=unhidden_datafiles).count()
+    c['datafiles'] = datafiles
+    # microtardis change end
+
+    c['has_write_permissions'] = \
+        authz.has_write_permissions(request, experiment_id)
+
+    c['protocol'] = []
+    download_urls = experiment.get_download_urls()
+    for key, value in download_urls.iteritems():
+        c['protocol'] += [[key, value]]
+
+    if 'status' in request.GET:
+        c['status'] = request.GET['status']
+    if 'error' in request.GET:
+        c['error'] = request.GET['error']
+
+    return HttpResponse(render_response_index(request,
+                        'tardis_portal/ajax/experiment_datasets.html', c))
+
+
+@never_cache
+@authz.dataset_access_required
+def retrieve_datafile_list(request, dataset_id, template_name='tardis_portal/ajax/datafile_list.html'):
+
+    params = {}
+
+    query = None
+    highlighted_dsf_pks = []
+
+    if 'query' in request.GET:
+        search_query = FacetFixedSearchQuery(backend=HighlightSearchBackend())
+        sqs = SearchQuerySet(query=search_query)
+        query =  SearchQueryString(request.GET['query'])
+        results = sqs.raw_search(query.query_string() + ' AND dataset_id_stored:%i' % (int(dataset_id))).load_all()
+        highlighted_dsf_pks = [int(r.pk) for r in results if r.model_name == 'dataset_file' and r.dataset_id_stored == int(dataset_id)]
+
+        params['query'] = query.query_string()
+
+    elif 'datafileResults' in request.session and 'search' in request.GET:
+        highlighted_dsf_pks = [r.pk for r in request.session['datafileResults']]
+
+    dataset_results = \
+        Dataset_File.objects.filter(
+            dataset__pk=dataset_id,
+        ).order_by('filename')
+
+    if request.GET.get('limit', False) and len(highlighted_dsf_pks):
+        dataset_results = \
+        dataset_results.filter(pk__in=highlighted_dsf_pks)
+        params['limit'] = request.GET['limit']
+
+    filename_search = None
+
+    if 'filename' in request.GET and len(request.GET['filename']):
+        filename_search = request.GET['filename']
+        dataset_results = \
+            dataset_results.filter(url__icontains=filename_search)
+
+        params['filename'] = filename_search
+
+    # pagination was removed by someone in the interface but not here.
+    # need to fix.
+    pgresults = 100
+
+    paginator = Paginator(dataset_results, pgresults)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    # If page request (9999) is out of range, deliver last page of results.
+
+    try:
+        dataset = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        dataset = paginator.page(paginator.num_pages)
+
+    is_owner = False
+    has_write_permissions = False
+
+    if request.user.is_authenticated():
+        experiment_id = Experiment.objects.get(dataset__id=dataset_id).id
+        is_owner = authz.has_experiment_ownership(request, experiment_id)
+
+        has_write_permissions = \
+            authz.has_write_permissions(request, experiment_id)
+
+    immutable = Dataset.objects.get(id=dataset_id).immutable
+
+    params = urlencode(params)
+
+    c = Context({
+        'dataset': dataset,
+        'paginator': paginator,
+        'immutable': immutable,
+        'dataset_id': dataset_id,
+        'filename_search': filename_search,
+        'is_owner': is_owner,
+        'highlighted_dataset_files': highlighted_dsf_pks,
+        'has_write_permissions': has_write_permissions,
+        'search_query' : query,
+        'params' : params
+
+        })
+    
+    
+    # microtardis change start
+    unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+    c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=unhidden_datafiles)
+    # microtardis change end
+    
+    
+    return HttpResponse(render_response_index(request, template_name, c))
+
+
 
 def write_thumbnails(datafile, img):
     basepath = settings.THUMBNAILS_PATH

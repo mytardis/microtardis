@@ -38,7 +38,9 @@ File filter: <input title='Enter part or all of a filename, then press enter. e.
 <br/>
 Select: <a class="dataset_selector_all clickable">[All]</a> / <a class="dataset_selector_none clickable">[None]</a>
 <br/><br/>
-{% for datafile in dataset.object_list %}
+<!-- microtardis change start -->
+{% for datafile in datafiles %}
+<!-- microtardis change end -->
 <li class="datafile{% if datafile.pk in highlighted_dataset_files %} search_match_file{% endif %}">
     <input type="checkbox" style="float:left;" class="datafile_checkbox" name="datafile" value="{{datafile.id}}" />
     <span style="float:left;">

@@ -112,10 +112,10 @@
     <div><label><input type="radio" name="show_search" value="matches">Search matches only</label></div>
   </form>
   {% endif %}
-  <!-- microtardis change start -->
+<!-- microtardis change start -->
   <!--<form method="POST" action="{% url tardis.tardis_portal.download.download_datafiles %}" target="_blank">-->
   <form id="main_form" method="POST">
-  <!-- microtardis change start -->
+ <!-- microtardis change end -->
     <input type="hidden" name="expid" value="{{experiment.id}}"/>
 
     <div id="datasets">
@@ -153,9 +153,10 @@
         </div> <!-- dataset metadata -->
 
           <div class="dataset_datafiles">
-              
-              <strong style="float:left; margin-right: 5px"><span{% if dataset.pk in file_matched_datasets %} style="background-color: #FFFF00"{% endif %}>Data Files ({{ dataset.dataset_file_set.count }})</span></strong>
-              
+<!-- microtardis change start -->
+{% load dict_tags %}
+              <strong style="float:left; margin-right: 5px"><span{% if dataset.pk in file_matched_datasets %} style="background-color: #FFFF00"{% endif %}>Data Files ({{ datafiles|dict_get:dataset }})</span></strong>
+<!-- microtardis change end -->
               {% if dataset.dataset_file_set.count|lt:"1000000" %}
                 {% if has_write_permissions %}
                   {% if not experiment.public %}
@@ -189,12 +190,12 @@
   </div> <!-- dataset -->
       {% endfor %}
     </div> <!-- datasets -->
-    <!-- microtardis change start -->
+<!-- microtardis change start -->
     <!--<input type="submit" value="Download Selected Files" />-->
     <input type='submit' id='btn_download' value='Download Selected Files'>
     <input type='submit' id='btn_hide' value='Hide Selected Files'>
     <input type='submit' id='btn_unhide' value='Unhide Selected Files'>
-    <!-- microtardis change end -->
+<!-- microtardis change end -->
     
   </form>
 
