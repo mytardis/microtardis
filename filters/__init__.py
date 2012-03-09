@@ -65,7 +65,7 @@ class FilterInitMiddleware(object):
             hook = self._safe_import(cls, args, kw)
             # XXX seems to requre a strong ref else it won't fire,
             # could be because some hooks are classes not functions.
-            post_save.connect(hook, sender=Dataset_File, weak=False)
+            post_save.connect(hook, sender=Dataset_File, weak=False, dispatch_uid=cls)
             logger.debug('Initialised postsave hook %s' % post_save.receivers)
 
         # disable middleware

@@ -457,7 +457,7 @@ def display_thumbnails(request, size, datafile_id):
     return HttpResponse(image_data, mimetype="image/jpeg")
 
 def direct_to_thumbnail_html(request, datafile_id, datafile_type):
-    return render_to_response("thumbnail.html", {"datafile_id": datafile_id,
+    return render_to_response("microtardis/thumbnail.html", {"datafile_id": datafile_id,
                                                  "datafile_type": datafile_type,})
 
 def get_spc_spectra(datafile):
