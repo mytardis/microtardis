@@ -5,10 +5,12 @@
 <script type="text/javascript">
 function set_hidden() {
     var show_hidden = document.getElementById('show_hidden').value;
+    var url = window.location.href;
+    var new_url = url.split('/',6).join('/');
     if (show_hidden=='False') {
-        window.location.href+='1/';
+        window.location.href = new_url + '/1/';
     } else {
-        window.location.href+='0/';
+        window.location.href = new_url + '/0/';
     }  
 }
 </script>
