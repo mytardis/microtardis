@@ -1,0 +1,19 @@
+{% extends "tardis_portal:tardis_portal/view_experiment.html" %}
+{% load dynurl %}
+     
+{% block header_extra %}
+<script type="text/javascript">
+function set_hidden() {
+    var show_hidden = document.getElementById('show_hidden').value;
+    if (show_hidden=='False') {
+        window.location.href+='1/';
+    } else {
+        window.location.href+='0/';
+    }  
+}
+</script>
+<div style='height: 1px;clear:both;'> </div>
+<div style="float:right;padding: 10px;"><a id='hidden_text' style="color: red;background-color:white;" href="javascript:set_hidden();">{{ request.session.session_hidden_text|default:'Show Hidden Datasets and Files' }}</a></div> 
+<input type='hidden' id='show_hidden' value={{ request.session.session_show_hidden|default:'False' }} >
+{% endblock header_extra %}
+    

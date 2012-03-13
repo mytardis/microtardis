@@ -147,6 +147,18 @@ def retrieve_parameters(request, dataset_file_id):
                         'tardis_portal/ajax/parameters.html', c))
 
 
+@never_cache
+@authz.experiment_access_required
+def redirect_view_experiment(request, experiment_id, show_hidden):
+    show_hidden = int(show_hidden)
+    if show_hidden == 0:
+        request.session['session_show_hidden'] = False
+        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
+    elif show_hidden == 1:
+        request.session['session_show_hidden'] = True
+        request.session['session_hidden_text'] = "Hide Hidden Datasets and Files"
+        
+    return HttpResponseRedirect(reverse('tardis.tardis_portal.views.view_experiment', args=(experiment_id,)))
 
 
 
@@ -178,12 +190,23 @@ def experiment_description(request, experiment_id):
 
     c['authors'] = experiment.author_experiment_set.all()
 
-    # microtardis change start
-    unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
-    c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
-    unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
-    c['datafiles'] = Dataset_File.objects.filter(dataset__experiment=experiment_id, pk__in=unhidden_datafiles)
-    # microtardis change end
+# microtardis change start
+    if 'session_show_hidden' not in request.session:
+        request.session['session_show_hidden'] = False
+    if 'session_hidden_text' not in request.session:
+        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
+        
+    if not request.session['session_show_hidden']:
+        # hide hidden objects
+        unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
+        unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+        c['datafiles'] = Dataset_File.objects.filter(dataset__experiment=experiment_id, pk__in=unhidden_datafiles)
+    else:
+        # show all objects
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id)
+        c['datafiles'] = Dataset_File.objects.filter(dataset__experiment=experiment_id)
+# microtardis change end
 
     acl = ExperimentACL.objects.filter(pluginId=django_user,
                                        experiment=experiment,
@@ -291,15 +314,33 @@ def experiment_datasets(request, experiment_id):
         c['highlighted_dataset_files'] = None
         c['file_matched_datasets'] = None
 
-    # microtardis change start
-    unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
-    c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
-    unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
-    datafiles = {}
-    for dataset in c['datasets']:
-        datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id, pk__in=unhidden_datafiles).count()
-    c['datafiles'] = datafiles
-    # microtardis change end
+# microtardis change start
+    if 'session_show_hidden' not in request.session:
+        request.session['session_show_hidden'] = False
+    if 'session_hidden_text' not in request.session:
+        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
+        
+    if not request.session['session_show_hidden']:
+        # hide hidden objects
+        unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
+        unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+        datafiles = {}
+        for dataset in c['datasets']:
+            datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id, pk__in=unhidden_datafiles).count()
+        c['datafiles'] = datafiles
+    else:
+        # show all objects
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id)
+        datafiles = {}
+        for dataset in c['datasets']:
+            datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id).count()
+        c['datafiles'] = datafiles
+        # highlight hidden objects
+        hidden_datasets = Dataset_Hidden.objects.filter(hidden=True).values_list('dataset', flat=True)
+        objects = Dataset.objects.filter(experiment=experiment_id, pk__in=hidden_datasets)
+        c['highlighted_datasets'] = [ obj.pk for obj in objects ]
+# microtardis change end
 
     c['has_write_permissions'] = \
         authz.has_write_permissions(request, experiment_id)
@@ -404,12 +445,24 @@ def retrieve_datafile_list(request, dataset_id, template_name='tardis_portal/aja
 
         })
     
-    
-    # microtardis change start
-    unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
-    c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=unhidden_datafiles)
-    # microtardis change end
-    
+# microtardis change start
+    if 'session_show_hidden' not in request.session:
+        request.session['session_show_hidden'] = False
+    if 'session_hidden_text' not in request.session:
+        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
+        
+    if not request.session['session_show_hidden']:
+        # hide hidden objects
+        unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+        c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=unhidden_datafiles)
+    else:
+        # show all objects
+        c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id)
+        # highlight hidden objects
+        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
+        objects = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=hidden_datafiles)
+        c['highlighted_dataset_files'] = [ obj.pk for obj in objects ]
+# microtardis change end
     
     return HttpResponse(render_response_index(request, template_name, c))
 
