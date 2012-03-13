@@ -198,10 +198,10 @@ def experiment_description(request, experiment_id):
         
     if not request.session['session_show_hidden']:
         # hide hidden objects
-        unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
-        c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
-        unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
-        c['datafiles'] = Dataset_File.objects.filter(dataset__experiment=experiment_id, pk__in=unhidden_datafiles)
+        hidden_datasets = Dataset_Hidden.objects.filter(hidden=True).values_list('dataset', flat=True)
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id).exclude(pk__in=hidden_datasets)
+        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
+        c['datafiles'] = Dataset_File.objects.filter(dataset__experiment=experiment_id).exclude(pk__in=hidden_datafiles)
     else:
         # show all objects
         c['datasets'] = Dataset.objects.filter(experiment=experiment_id)
@@ -322,12 +322,12 @@ def experiment_datasets(request, experiment_id):
         
     if not request.session['session_show_hidden']:
         # hide hidden objects
-        unhidden_datasets = Dataset_Hidden.objects.filter(hidden=False).values_list('dataset', flat=True)
-        c['datasets'] = Dataset.objects.filter(experiment=experiment_id, pk__in=unhidden_datasets)
-        unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
+        hidden_datasets = Dataset_Hidden.objects.filter(hidden=True).values_list('dataset', flat=True)
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id).exclude(pk__in=hidden_datasets)
+        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
         datafiles = {}
         for dataset in c['datasets']:
-            datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id, pk__in=unhidden_datafiles).count()
+            datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id).exclude(pk__in=hidden_datafiles).count()
         c['datafiles'] = datafiles
     else:
         # show all objects
@@ -453,8 +453,8 @@ def retrieve_datafile_list(request, dataset_id, template_name='tardis_portal/aja
         
     if not request.session['session_show_hidden']:
         # hide hidden objects
-        unhidden_datafiles = Datafile_Hidden.objects.filter(hidden=False).values_list('datafile', flat=True)
-        c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=unhidden_datafiles)
+        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
+        c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id).exclude(pk__in=hidden_datafiles)
     else:
         # show all objects
         c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id)
