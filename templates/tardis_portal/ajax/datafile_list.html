@@ -38,8 +38,8 @@ File filter: <input title='Enter part or all of a filename, then press enter. e.
 <br/>
 Select: <a class="dataset_selector_all clickable">[All]</a> / <a class="dataset_selector_none clickable">[None]</a>
 <br/><br/>
+{% for datafile in dataset.object_list %}
 <!-- microtardis change start -->
-{% for datafile in datafiles %}
 <!--<li class="datafile{% if datafile.pk in highlighted_dataset_files %} search_match_file{% endif %}">-->
 <li class="datafile{% if datafile.pk in highlighted_dataset_files or datafile.pk in linethrough_dataset_files%} search_match_file{% endif %}">
 <!-- microtardis change end -->

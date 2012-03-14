@@ -389,6 +389,18 @@ def retrieve_datafile_list(request, dataset_id, template_name='tardis_portal/aja
         Dataset_File.objects.filter(
             dataset__pk=dataset_id,
         ).order_by('filename')
+        
+# microtardis change start
+    if 'session_show_hidden' not in request.session:
+        request.session['session_show_hidden'] = False
+    if 'session_hidden_text' not in request.session:
+        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
+        
+    if not request.session['session_show_hidden']:
+        # hide hidden objects
+        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
+        dataset_results = dataset_results.exclude(pk__in=hidden_datafiles)
+# microtardis change end
 
     if request.GET.get('limit', False) and len(highlighted_dsf_pks):
         dataset_results = \
@@ -449,26 +461,16 @@ def retrieve_datafile_list(request, dataset_id, template_name='tardis_portal/aja
         'params' : params
 
         })
-    
+
 # microtardis change start
-    if 'session_show_hidden' not in request.session:
-        request.session['session_show_hidden'] = False
-    if 'session_hidden_text' not in request.session:
-        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
-        
-    if not request.session['session_show_hidden']:
-        # hide hidden objects
-        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
-        c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id).exclude(pk__in=hidden_datafiles)
-    else:
+    if request.session['session_show_hidden']:
         # show all objects
-        c['datafiles'] = Dataset_File.objects.filter(dataset__pk=dataset_id)
         # highlight hidden objects
         hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
         objects = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=hidden_datafiles)
         c['linethrough_dataset_files'] = [ obj.pk for obj in objects ]
 # microtardis change end
-    
+
     return HttpResponse(render_response_index(request, template_name, c))
 
 
