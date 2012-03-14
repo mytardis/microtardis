@@ -40,14 +40,24 @@ Select: <a class="dataset_selector_all clickable">[All]</a> / <a class="dataset_
 <br/><br/>
 <!-- microtardis change start -->
 {% for datafile in datafiles %}
+<!--<li class="datafile{% if datafile.pk in highlighted_dataset_files %} search_match_file{% endif %}">-->
+<li class="datafile{% if datafile.pk in highlighted_dataset_files or datafile.pk in linethrough_dataset_files%} search_match_file{% endif %}">
 <!-- microtardis change end -->
-<li class="datafile{% if datafile.pk in highlighted_dataset_files %} search_match_file{% endif %}">
     <input type="checkbox" style="float:left;" class="datafile_checkbox" name="datafile" value="{{datafile.id}}" />
     <span style="float:left;">
-
+<!-- microtardis change start -->
+  {% if datafile.pk in linethrough_dataset_files %}
+    <del>
+  {% endif %}
+<!-- microtardis change end -->
     <span{% if datafile.pk in highlighted_dataset_files %} style="background-color: #FFFF00"{% endif %}>
     <a class="filelink" href="{{ datafile.get_download_url }}" target="_blank">{{ datafile.filename }}</a> 
     </span>
+<!-- microtardis change start -->
+  {% if datafile.pk in linethrough_dataset_files %}
+    </del>
+  {% endif %}
+<!-- microtardis change end -->
     {% if datafile.size %}<span style="margin-right: 5px">({{ datafile.size|filesizeformat }})</span>{% endif %}
      </span>
     {% if has_write_permissions and not immutable %}

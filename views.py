@@ -336,10 +336,15 @@ def experiment_datasets(request, experiment_id):
         for dataset in c['datasets']:
             datafiles[dataset] = Dataset_File.objects.filter(dataset=dataset.id).count()
         c['datafiles'] = datafiles
-        # highlight hidden objects
+        # highlight hidden datasets
         hidden_datasets = Dataset_Hidden.objects.filter(hidden=True).values_list('dataset', flat=True)
-        objects = Dataset.objects.filter(experiment=experiment_id, pk__in=hidden_datasets)
-        c['highlighted_datasets'] = [ obj.pk for obj in objects ]
+        dataset_objects = Dataset.objects.filter(experiment=experiment_id, pk__in=hidden_datasets)
+        c['linethrough_datasets'] = [ obj.pk for obj in dataset_objects ]
+        # highlight datasets which have hidden datafiles
+        hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
+        experiment_dataset_objects = Dataset.objects.filter(experiment=experiment_id)
+        hidden_datafiles_objects = Dataset_File.objects.filter(pk__in=hidden_datafiles, dataset__in=experiment_dataset_objects)
+        c['file_hidden_datasets'] = list(set(obj.dataset.pk for obj in hidden_datafiles_objects))
 # microtardis change end
 
     c['has_write_permissions'] = \
@@ -461,7 +466,7 @@ def retrieve_datafile_list(request, dataset_id, template_name='tardis_portal/aja
         # highlight hidden objects
         hidden_datafiles = Datafile_Hidden.objects.filter(hidden=True).values_list('datafile', flat=True)
         objects = Dataset_File.objects.filter(dataset__pk=dataset_id, pk__in=hidden_datafiles)
-        c['highlighted_dataset_files'] = [ obj.pk for obj in objects ]
+        c['linethrough_dataset_files'] = [ obj.pk for obj in objects ]
 # microtardis change end
     
     return HttpResponse(render_response_index(request, template_name, c))
