@@ -19,3 +19,65 @@ function set_hidden() {
 <input type='hidden' id='show_hidden' value={{ request.session.session_show_hidden|default:'False' }} >
 {% endblock header_extra %}
     
+    
+    
+{% block fullpage %}
+
+    <div class="jqmAlert" id="jqmAlertExpAdd">
+ 
+        <div class="jqmAlertWindow">
+            <div class="jqmAlertTitle clearfix">
+                <h1>Add Parameters</h1><a href="#" class="jqmClose"><em>Close</em></a>
+            </div>
+ 
+            <div class="jqmAlertContent">
+                <p>Please wait... <img src="{{ STATIC_URL }}/images/ajax-loader.gif" alt="loading" /></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="jqmAlert" id="jqmAlertExpEdit">
+
+        <div class="jqmAlertWindow">
+            <div class="jqmAlertTitle clearfix">
+                <h1>Edit Parameters</h1><a href="#" class="jqmClose"><em>Close</em></a>
+            </div>
+
+            <div class="jqmAlertContent">
+                <p>Please wait... <img src="{{ STATIC_URL }}/images/ajax-loader.gif" alt="loading" /></p>
+            </div>
+        </div>
+    </div>
+
+  <div id="fullpage">
+    <div class="post">
+      {% block experiment_title %}
+      <h1 class="title">{{ experiment.title }}</h1>
+      {% endblock experiment_title %}
+        {% if has_write_permissions %}{% if not experiment.public %}
+            <a href="{{ experiment.get_edit_url }}">
+          <img src="{{ STATIC_URL }}/images/icon_changelink.gif" >
+          </a>
+
+    {% endif %}{% endif %}
+      </h1>
+    </div>
+
+    <div class="tabcontainer">
+      <div id="tabs">
+    <ul>
+      <li><a href="{% url tardis.tardis_portal.views.experiment_description experiment.id %}">Description</a></li>
+<!-- microtardis change start -->
+      <!--<li><a href="{% url tardis.tardis_portal.views.experiment_datasets experiment.id %}?{% if search_query %}query={{ search_query.url_safe_query }}{% if search %}&{% endif %}{% endif %}{% if search %}search=true{% endif %}">Datasets ({{ experiment.dataset_set.count }})</a></li>-->
+      <li><a href="{% url tardis.tardis_portal.views.experiment_datasets experiment.id %}?{% if search_query %}query={{ search_query.url_safe_query }}{% if search %}&{% endif %}{% endif %}{% if search %}search=true{% endif %}">Datasets ({{ datasets.count }})</a></li>
+<!-- microtardis change end -->
+      {% for appurl, appname in apps %}
+        <li><a href="{% dynurl appurl experiment.id %}">{{ appname }}</a></li>
+      {% endfor %}
+    </ul>
+      </div><!-- End tab container -->
+
+    </div>
+  </div>
+
+{% endblock %}

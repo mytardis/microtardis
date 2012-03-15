@@ -6,6 +6,7 @@ from django.conf import settings
 urlpatterns = patterns('tardis.microtardis.views',
     # override tardis_portal url patterns
     (r'^experiment/view/(?P<experiment_id>\d+)/(?P<show_hidden>\d+)/$', 'redirect_view_experiment'),
+    (r'^experiment/view/(?P<experiment_id>\d+)/$', 'view_experiment'),
     (r'^ajax/parameters/(?P<dataset_file_id>\d+)/$', 'retrieve_parameters'),
     (r'^ajax/experiment_description/(?P<experiment_id>\d+)/$', 'experiment_description'),
     (r'^ajax/experiment_datasets/(?P<experiment_id>\d+)/$', 'experiment_datasets'),

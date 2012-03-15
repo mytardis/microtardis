@@ -43,6 +43,9 @@ from tardis.microtardis.models import Datafile_Hidden
 from tardis.microtardis.models import Dataset_Harvest
 from tardis.microtardis.models import Datafile_Harvest
 
+# for view_experiment
+from tardis.urls import getTardisApps
+
 # import and configure matplotlib library
 try:
     os.environ['HOME'] = settings.MATPLOTLIB_HOME
@@ -158,8 +161,81 @@ def redirect_view_experiment(request, experiment_id, show_hidden):
         request.session['session_show_hidden'] = True
         request.session['session_hidden_text'] = "Hide Hidden Datasets and Files"
         
-    return HttpResponseRedirect(reverse('tardis.tardis_portal.views.view_experiment', args=(experiment_id,)))
+    return HttpResponseRedirect(reverse('tardis.microtardis.views.view_experiment', args=(experiment_id,)))
 
+
+@authz.experiment_access_required
+def view_experiment(request, experiment_id):
+
+    """View an existing experiment.
+
+    :param request: a HTTP Request instance
+    :type request: :class:`django.http.HttpRequest`
+    :param experiment_id: the ID of the experiment to be edited
+    :type experiment_id: string
+    :rtype: :class:`django.http.HttpResponse`
+
+    """
+    c = Context({})
+
+    try:
+        experiment = Experiment.safe.get(request, experiment_id)
+    except PermissionDenied:
+        return return_response_error(request)
+    except Experiment.DoesNotExist:
+        return return_response_not_found(request)
+
+# microtardis change start
+    if 'session_show_hidden' not in request.session:
+        request.session['session_show_hidden'] = False
+    if 'session_hidden_text' not in request.session:
+        request.session['session_hidden_text'] = "Show Hidden Datasets and Files"
+    
+    if not request.session['session_show_hidden']:
+        # hide hidden objects
+        hidden_datasets = Dataset_Hidden.objects.filter(hidden=True).values_list('dataset', flat=True)
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id).exclude(pk__in=hidden_datasets)
+    else:
+        # show all datasets
+        c['datasets'] = Dataset.objects.filter(experiment=experiment_id)
+# microtardis change end
+
+    c['experiment'] = experiment
+    c['has_write_permissions'] = \
+        authz.has_write_permissions(request, experiment_id)
+    if request.user.is_authenticated():
+        c['is_owner'] = authz.has_experiment_ownership(request, experiment_id)
+    c['subtitle'] = experiment.title
+    c['nav'] = [{'name': 'Data', 'link': '/experiment/view/'},
+                {'name': experiment.title,
+                 'link': experiment.get_absolute_url()}]
+
+    if 'status' in request.POST:
+        c['status'] = request.POST['status']
+    if 'error' in request.POST:
+        c['error'] = request.POST['error']
+    if 'query' in request.GET:
+        c['search_query'] = SearchQueryString(request.GET['query'])
+    if  'search' in request.GET:
+        c['search'] = request.GET['search']
+    if  'load' in request.GET:
+        c['load'] = request.GET['load']
+
+    import sys
+    appnames = []
+    appurls = []
+    for app in getTardisApps():
+        try:
+            appnames.append(sys.modules['%s.%s.settings'
+                                        % (settings.TARDIS_APP_ROOT, app)].NAME)
+            appurls.append('%s.%s.views.index' % (settings.TARDIS_APP_ROOT, app))
+        except:
+            pass
+
+    c['apps'] = zip(appurls, appnames)
+
+    return HttpResponse(render_response_index(request,
+                        'tardis_portal/view_experiment.html', c))
 
 
 @authz.experiment_access_required
