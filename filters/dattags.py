@@ -41,6 +41,7 @@ dattags.py
 
 from tardis.tardis_portal.models import Schema, DatafileParameterSet
 from tardis.tardis_portal.models import ParameterName, DatafileParameter
+from tardis.tardis_portal.models import DatasetParameter
 import logging
 import string
 import csv
@@ -107,6 +108,19 @@ class DATTagsFilter(object):
         for part in pathSep.split(filepath):
             if part in self.instruments.keys():
                 instr_name = part
+        
+        # Find instrument name in dataset metadata
+        if not instr_name:
+            # couldn't find it in filepath, then try dataset metadata
+            dataset_params = DatasetParameter.objects.filter(parameterset__dataset__id=instance.dataset.id)
+            for dataset_param in dataset_params:
+                str_value = str(dataset_param.string_value)
+                if str_value.startswith('http://'):
+                    parts = str_value.split('/')
+                    if len(parts) > 4:
+                        instr_name = parts[4]
+                else:
+                    continue
 
         logger.debug("filepath=%s" % filepath)
         logger.debug("instr_name=%s" % instr_name)
@@ -261,7 +275,7 @@ class DATTagsFilter(object):
                     unit = "kV"
                     ret[field] = [value, unit]
         except:
-            print "Failed to extract spectral metadata from *.dat file."
+            #print "Failed to extract spectral metadata from *.dat file."
             import sys
             #print sys.exc_info()
             #print ret

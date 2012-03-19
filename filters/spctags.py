@@ -40,6 +40,7 @@ spctags.py
 
 from tardis.tardis_portal.models import Schema, DatafileParameterSet
 from tardis.tardis_portal.models import ParameterName, DatafileParameter
+from tardis.tardis_portal.models import DatasetParameter
 import logging
 import struct
 import string
@@ -150,6 +151,19 @@ class SPCTagsFilter(object):
         for part in pathSep.split(filepath):
             if part in self.instruments.keys():
                 instr_name = part
+                
+        # Find instrument name in dataset metadata
+        if not instr_name:
+            # couldn't find it in filepath, then try dataset metadata
+            dataset_params = DatasetParameter.objects.filter(parameterset__dataset__id=instance.dataset.id)
+            for dataset_param in dataset_params:
+                str_value = str(dataset_param.string_value)
+                if str_value.startswith('http://'):
+                    parts = str_value.split('/')
+                    if len(parts) > 4:
+                        instr_name = parts[4]
+                else:
+                    continue
 
         logger.debug("filepath=%s" % filepath)
         logger.debug("instr_name=%s" % instr_name)
@@ -325,10 +339,10 @@ class SPCTagsFilter(object):
                         energy_step += 4
                         
                         # Height
-                        print "offset ", height_offset + height_step
+                        #print "offset ", height_offset + height_step
                         spc.seek(height_offset + height_step)
                         height_value = struct.unpack('I', spc.read(4))[0]
-                        print "height_value ", height_value
+                        #print "height_value ", height_value
                         height_step += 4
                         
                         # compose the peak value
@@ -349,7 +363,7 @@ class SPCTagsFilter(object):
                 # get field and its value
                 ret[field] = [value, unit]
         except:
-            print "Failed to extract spectral metadata from *.spc file."
+            #print "Failed to extract spectral metadata from *.spc file."
             import sys
             #print sys.exc_info()
             #print ret
