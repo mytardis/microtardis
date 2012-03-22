@@ -65,11 +65,12 @@ class FilterInitMiddleware(object):
             hook = self._safe_import(cls, args, kw)
             # XXX seems to requre a strong ref else it won't fire,
             # could be because some hooks are classes not functions.
-            post_save.connect(hook, sender=Dataset_File, weak=False, dispatch_uid=cls)
+            if hook:
+                post_save.connect(hook, sender=Dataset_File, weak=False, dispatch_uid=cls)
             logger.debug('Initialised postsave hook %s' % post_save.receivers)
 
         # disable middleware
-        raise MiddlewareNotUsed()
+        #raise MiddlewareNotUsed()
 
     def _safe_import(self, path, args, kw):
         try:
@@ -83,10 +84,11 @@ class FilterInitMiddleware(object):
             raise ImproperlyConfigured('Error importing filter %s: "%s"' %
                                        (filter_module, e))
         try:
-            filter_class = getattr(mod, filter_classname)
+            filter_class = getattr(mod, filter_classname, None)
         except AttributeError:
-            raise ImproperlyConfigured('Filter module "%s" does not define a "%s" class' %
+            raise ImproperlyConfigured('Filter module "%s" does not define a "%s" attribute' %
                                        (filter_module, filter_classname))
-
-        filter_instance = filter_class(*args, **kw)
+        filter_instance = None
+        if filter_class:
+            filter_instance = filter_class(*args, **kw)
         return filter_instance

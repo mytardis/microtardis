@@ -7,7 +7,7 @@ from tardis.test_settings import *
 # Add Middleware
 tmp = list(MIDDLEWARE_CLASSES)
 tmp.append(
-    'tardis.tardis_portal.filters.FilterInitMiddleware'
+    'tardis.microtardis.filters.FilterInitMiddleware'
 )
 MIDDLEWARE_CLASSES = tuple(tmp)
 
@@ -35,3 +35,6 @@ MATPLOTLIB_HOME = path.abspath(path.join(path.dirname(__file__),
 # Staging Protocol
 STAGING_PROTOCOL = 'localdb'
 GET_FULL_STAGING_PATH_TEST = path.join(STAGING_PATH, "test_user")
+
+# Filter middleware for auto-ingest
+FILTER_MIDDLEWARE = (("tardis.microtardis.filters","FilterInitMiddleware"),)

@@ -35,7 +35,7 @@ TEMPLATE_DIRS = tuple(tmp)
 # Add Middleware
 tmp = list(MIDDLEWARE_CLASSES)
 tmp.append(
-    'tardis.tardis_portal.filters.FilterInitMiddleware'
+    'tardis.microtardis.filters.FilterInitMiddleware'
 )
 MIDDLEWARE_CLASSES = tuple(tmp)
 
@@ -47,8 +47,8 @@ POST_SAVE_FILTERS = [
     ]
 
 # Log files
-SYSTEM_LOG_FILENAME = '/home/rmmf/CoreTardis/var/log/request.log'
-MODULE_LOG_FILENAME = 'home/rmmf/CoreTardis/var/log/tardis.log'
+SYSTEM_LOG_FILENAME = '/home/rmmf/mytardis/var/log/request.log'
+MODULE_LOG_FILENAME = 'home/rmmf/mytardis/var/log/tardis.log'
 
 # Institution name
 DEFAULT_INSTITUTION = "RMIT Microscopy and Microanalysis Facility"
@@ -57,8 +57,10 @@ DEFAULT_INSTITUTION = "RMIT Microscopy and Microanalysis Facility"
 THUMBNAILS_PATH = path.abspath(path.join(path.dirname(__file__),
     '../var/thumbnails/')).replace('\\', '/')
 
-# Template loaders
+# Installed application
 INSTALLED_APPS = ("tardis.microtardis",) + INSTALLED_APPS
+
+# Template loaders
 TEMPLATE_LOADERS = (
     'tardis.microtardis.templates.loaders.app_specific.Loader',
     'django.template.loaders.app_directories.Loader',
@@ -92,3 +94,6 @@ PRIVATE_DATAFILES = False
 # Staging Protocol
 STAGING_PROTOCOL = 'localdb'
 GET_FULL_STAGING_PATH_TEST = path.join(STAGING_PATH, "test_user")
+
+# Filter middleware for auto-ingest
+FILTER_MIDDLEWARE = (("tardis.microtardis.filters","FilterInitMiddleware"),)

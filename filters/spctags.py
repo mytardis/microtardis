@@ -130,10 +130,10 @@ class SPCTagsFilter(object):
         """
         instance = kwargs.get('instance')
         created = kwargs.get('created')
-        if not created:
-            # Don't extract on edit
-            return
-        #  schema = self.getSchema()
+#        if not created:
+#            # Don't extract on edit
+#            return
+#        #  schema = self.getSchema()
         
         filepath = instance.get_absolute_filepath()
         if not filepath:
