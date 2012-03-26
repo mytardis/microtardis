@@ -97,3 +97,6 @@ GET_FULL_STAGING_PATH_TEST = path.join(STAGING_PATH, "test_user")
 
 # Filter middleware for auto-ingest
 FILTER_MIDDLEWARE = (("tardis.microtardis.filters","FilterInitMiddleware"),)
+
+# URL for EMBS authentication
+EMBS_URL = "http://embs.rmit.edu.au/auth.php?"

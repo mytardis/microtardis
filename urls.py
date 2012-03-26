@@ -11,6 +11,7 @@ urlpatterns = patterns('tardis.microtardis.views',
     (r'^ajax/experiment_description/(?P<experiment_id>\d+)/$', 'experiment_description'),
     (r'^ajax/experiment_datasets/(?P<experiment_id>\d+)/$', 'experiment_datasets'),
     (r'^ajax/datafile_list/(?P<dataset_id>\d+)/$', 'retrieve_datafile_list'),
+    (r'^login/$', 'login'),
     # microtardis's own url patterns
     (r'^microtardis/spectra_png/(?P<size>[\w\.]+)/(?P<datafile_id>\d+)/(?P<datafile_type>[\w\.]+)/$', 'get_spectra_png'),
     (r'^microtardis/spectra_csv/(?P<datafile_id>\d+)/$', 'get_spectra_csv'),

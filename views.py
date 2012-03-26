@@ -5,10 +5,15 @@ import struct
 import csv
 import StringIO
 import numpy
+import urllib2
+import hashlib
+import json
+import sys
 
 from django.template import Context
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseForbidden
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.utils import simplejson as json
@@ -19,6 +24,11 @@ from django.contrib.auth.models import User
 # for retrieve_datafile_list
 from django.core.paginator import Paginator
 from urllib import urlencode
+# for login
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import Permission
 
 from tardis.tardis_portal.auth import decorators as authz
 from tardis.tardis_portal.shortcuts import render_response_index
@@ -28,6 +38,11 @@ from tardis.tardis_portal.staging import write_uploaded_file_to_dataset
 from tardis.tardis_portal.auth.localdb_auth import django_user
 # for experiment_datasets
 from tardis.tardis_portal.views import getNewSearchDatafileSelectionForm
+# for login
+from tardis.tardis_portal.forms import LoginForm
+from tardis.tardis_portal.auth import login as tardis_login
+from tardis.tardis_portal.auth import auth_service
+from tardis.tardis_portal.auth.utils import get_or_create_user
 
 from tardis.tardis_portal.models import DatafileParameterSet
 from tardis.tardis_portal.models import Schema
@@ -36,6 +51,9 @@ from tardis.tardis_portal.models import Dataset_File
 # for experiment_description
 from tardis.tardis_portal.models import Experiment
 from tardis.tardis_portal.models import ExperimentACL
+# for login
+from tardis.tardis_portal.models import UserProfile
+from tardis.tardis_portal.models import UserAuthentication
 
 from tardis.microtardis.models import Experiment_Hidden
 from tardis.microtardis.models import Dataset_Hidden
@@ -148,6 +166,107 @@ def retrieve_parameters(request, dataset_file_id):
 
     return HttpResponse(render_response_index(request,
                         'tardis_portal/ajax/parameters.html', c))
+
+
+def login(request):
+    
+    if type(request.user) is not AnonymousUser:
+        return HttpResponseRedirect('/')
+
+    c = Context({'loginForm': LoginForm()})
+    
+    # get POST and GET variables
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    authMethod = request.POST.get('authMethod', '')
+    next = request.GET.get('next', '/')
+    
+    if not username or not password:
+        # show login form
+        return HttpResponse(render_response_index(request, 'tardis_portal/login.html', c))
+    
+    #authenticate user in mytardis localdb
+    user = auth_service.authenticate(authMethod=authMethod, request=request)
+    user_exist = None
+    try:
+        user_exist = User.objects.get(username=username)
+    except User.DoesNotExist:
+        pass
+    # check the existence of user
+    if user:
+        # user existed and authentication passed
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        tardis_login(request, user)
+        return HttpResponseRedirect(next)
+    elif user_exist:
+        # user existed but authentication failed
+        c['status'] = "Sorry, username and password don't match."
+        c['error'] = True
+        return HttpResponseForbidden( render_response_index(request, 'tardis_portal/login.html', c))
+    else:
+        # user doesn't exist, create one if EMBS authentication succeeded
+        
+        # authenticate username and password with EMBS system
+        embs_url = settings.EMBS_URL
+        embs_url += "username=%s&passwordmd5=%s" % ( str(username).lower(), 
+                                                     hashlib.md5(password).hexdigest() )
+        try:
+            response = urllib2.urlopen(embs_url).read()
+            if response.status() == 200:
+#            dummy_status = 200
+#            dummy_json = """
+#{"user_id":       "1",
+# "fname":         "e123",
+# "lname":         "e123",
+# "title":         "mr",
+# "department":    "rmmf",
+# "login_name":    "e123",
+# "email":         "e123@e123.com",
+# "phone":         "12345",
+# "user_type":     "student",
+# "user_category": "student" } """
+#            if dummy_status == 200:
+                # succeeded authentication
+                # create new user and userprofile into mytardis localdb
+                user_json = json.loads(response.read())
+#                user_json = json.loads(dummy_json)
+                email = user_json['email']
+                first_name = user_json['fname']
+                last_name = user_json['lname']
+                user = User.objects.create_user(username=username,
+                                                password=password,
+                                                email=email)
+                user.first_name = first_name
+                user.last_name = last_name
+                user.user_permissions.add(Permission.objects.get(codename='add_experiment'))
+                user.user_permissions.add(Permission.objects.get(codename='change_experiment'))
+                user.user_permissions.add(Permission.objects.get(codename='change_experimentacl'))
+                user.user_permissions.add(Permission.objects.get(codename='change_group'))
+                user.user_permissions.add(Permission.objects.get(codename='change_userauthentication'))
+                user.save()
+
+                userProfile = UserProfile(user=user, isDjangoAccount=False)
+                userProfile.save()
+            
+                userAuth = UserAuthentication(userProfile=userProfile,
+                                              username=username, 
+                                              authenticationMethod=authMethod)
+                userAuth.save()
+                
+                # log in with valid user
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                tardis_login(request, user)
+                return HttpResponseRedirect(next)
+            else:
+                # authentication failed
+                c['status'] = "Sorry, username and password don't match."
+                c['error'] = True
+                return HttpResponseForbidden( render_response_index(request, 'tardis_portal/login.html', c))
+        except urllib2.URLError, e:
+            c['status'] = "Sorry, error happened with EMBS authentication: %s" % e
+            c['error'] = True
+
+    return HttpResponseForbidden( render_response_index(request, 'tardis_portal/login.html', c))
 
 
 @never_cache
