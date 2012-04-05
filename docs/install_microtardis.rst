@@ -20,16 +20,22 @@ MicroTardis is currently only supported on RHEL and Debian/Ubuntu with SELinux d
 
 1. Redhat::
 
-      sudo yum install git gcc httpd mod_wsgi mysql mysql-server MySQL-python python-setuptools python-devel 
-      sudo yum install cyrus-sasl-ldap cyrus-sasl-devel openldap-devel libxslt libxslt-devel libxslt-python
+      yum install git gcc gcc-c++ httpd mod_wsgi mysql mysql-server MySQL-python 
+      yum install python python-devel python-setuptools libjpeg-devel numpy python-matplotlib
+      yum install cyrus-sasl-ldap cyrus-sasl-devel openldap-devel libxslt libxslt-devel libxslt-python
+      easy_install PIL
 
 2. Debian/Ubuntu::
 
-      sudo apt-get install git python-dev libpq-dev libssl-dev libsasl2-dev libldap2-dev libxslt1.1 libxslt1-dev python-libxslt1 libexiv2-dev
+      apt-get install git gcc libapache2-mod-wsgi mysql mysql-server python-mysqldb 
+      apt-get instlal python python-dev python-setuptools python-numpy python-matplotlib
+      apt-get install libpq-dev libssl-dev libsasl2-dev libldap2-dev libxslt1.1 libxslt1-dev python-libxslt1 libexiv2-dev
+      easy_install PIL
+      
    
 Step 2: Access the Internet via the RMIT Proxy
 ----------------------------------------------
-If you would like to install MicroTardis in a RMIT machine, it's needed to have RMIT proxy settings to access the Internet. 
+If you would like to install MicroTardis in a RMIT machine, it's needed to have RMIT HTTP/HTTPS proxy settings to access the Internet. 
 
 1. Copy the following lines into ``/env/environment`` with root permission to have system-wide proxy settings::
    
@@ -41,12 +47,14 @@ If you would like to install MicroTardis in a RMIT machine, it's needed to have 
 2. Save the file and re-login. 
 3. To make sure the setting is there by opening a terminal and issuing the command::
 
-      export | grep http_proxy
+      export | grep -i proxy
+    
     
 Step 3: Download MyTardis Source Code
 -------------------------------------
-1. To get the 2.5 release branch::
+1. Get the 2.5 release branch and check out the source code into ``/opt/`` directory::
 
+      cd /opt
       git clone git://github.com/mytardis/mytardis.git
       cd mytardis
       git tag -l
@@ -54,12 +62,13 @@ Step 3: Download MyTardis Source Code
 
 2. If you get an error of connection timed out as shown below::
 
-      Initialized empty Git repository in /dirpath/mytardis/.git/
+      Initialized empty Git repository in /opt/mytardis/.git/
       github.com[0: 207.97.227.239]: errno=Connection timed out
       fatal: unable to connect a socket (Connection timed out)
 
    Please use the following commands instead (cloning GitHub repository over HTTP)::
 
+      cd /opt
       git config --global http.proxy bproxy.rmit.edu.au:8080
       git clone https://github.com/mytardis/mytardis.git
       cd mytardis
@@ -68,11 +77,12 @@ Step 3: Download MyTardis Source Code
 
    It might be slow and recommended to be used if the git port(9418) is blocked due to a firewall constraint.
 
+
 Step 4: Download MicroTardis Extensions
 ---------------------------------------
 1. To get the current master branch::
 
-      cd mytardis/tardis
+      cd /opt/mytardis/tardis
       git clone https://github.com/mytardis/microtardis.git
    
    
@@ -83,7 +93,7 @@ MicroTardis/MyTardis is using the Buildout build system to handle the installati
    
 1. Run the Buildout bootstrap script to initialise Buildout::
 
-      cd mytardis
+      cd /opt/mytardis
       python bootstrap.py
    
    If you get a Python urllib2.URLError complaining "Connection timed out", you may have Internet access blocked. Please do Step 2, or run the following commands before bootstrap::
@@ -95,12 +105,12 @@ MicroTardis/MyTardis is using the Buildout build system to handle the installati
    
 2. Download and build Django and all dependencies::
 
-      cd mytardis
+      cd /opt/mytardis
       bin/buildout
    
    This can be run again at any time to check for and download any new dependencies.   
 
-   If you get an error from getting distribution for 'coverage==3.4'. Please replace the following line in *eggs* directive under buildout section in *buildout.cfg* file::
+   If you get an error from getting distribution for 'coverage==3.4'. Please replace the following line in *eggs* directive under *buildout* section in ``/opt/mytardis/buildout.cfg`` file::
 
       coverage==3.4
 
@@ -116,33 +126,34 @@ Step 1: MicroTardis settings.py File
 
 Configuring MicroTardis/MyTardis is done through a standard Django 
 *settings.py* file. MyTardis comes with a sample configuration file at 
-``tardis/settings_changeme.py``. The file 
-``tardis/microtardis/settings_microtardis.py`` is an example of 
-``tardis/settings_changeme.py`` for MyTardis that includes support for 
+``/opt/mytardis/tardis/settings_changeme.py``. The file 
+``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` is an example of 
+``/opt/mytardis/tardis/settings_changeme.py`` for MyTardis that includes support for 
 MicroTardis extensions. The following steps will lead you to have your own
 settings file for your deployment.
 
-1. Copy the file ``tardis/microtardis/settings_microtardis.py`` into the directory in which ``settings_changeme.py`` is::
+1. Copy the file ``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` into the directory in which ``settings_changeme.py`` is::
 
-      cd mytardis
-      cp tardis/microtardis/settings_microtardis.py tardis/settings.py
+      cd /opt/mytardis/tardis
+      cp microtardis/settings_microtardis.py settings.py
+
 
 Step 2: MicroTardis Database
 ----------------------------
 1. Ensure that the MySQL database has been started::
    
-      sudo /etc/init.d/mysqld start
+      /etc/init.d/mysqld start
    
 2. Configure MySQL to run every time the system starts::
 
-      sudo chkconfig mysqld on
+      chkconfig mysqld on
 
-3. Run the following command to configure the database; don't forget to replace 'secret' with a password of your choice::
+3. Run the following command to configure the database; don't forget to replace *'secret'* with a password of your choice::
 
-      sudo mysql -e "CREATE DATABASE microtardis"
-      sudo mysql -e "GRANT ALL PRIVILEGES ON microtardis.* TO 'microtardis'@'localhost' IDENTIFIED BY 'secret';"
+      mysql -e "CREATE DATABASE microtardis"
+      mysql -e "GRANT ALL PRIVILEGES ON microtardis.* TO 'microtardis'@'localhost' IDENTIFIED BY 'secret';"
    
-4. Edit the ``tardis/settings.py`` file and ensure that DATABASE_PASSWORD and other database parameters match the values used to create the MicroTardis database::
+4. Edit the ``/opt/mytardis/tardis/settings.py`` file and ensure that DATABASE_PASSWORD and other database parameters match the values used to create the MicroTardis database::
 
       DATABASES = {}
       DATABASES['default'] = {}
@@ -152,29 +163,31 @@ Step 2: MicroTardis Database
       DATABASES['default']['NAME'] = 'microtardis'
       DATABASES['default']['USER'] = 'microtardis'
       DATABASES['default']['PASSWORD'] = 'secret'
+      
+   This is the minimum set of changes required to successfully run the server. You can make any other site-specific changes in ``/opt/mytardis/tardis/settings.py`` as necessary.
 
-5. Run the following command to ensure that the MySQL instance has a root password; don't forget to replace the word 'secret' with a password of your choice::
+5. Run the following command to ensure that the MySQL instance has a root password; don't forget to replace the word *'secret'* with a password of your choice::
 
-      sudo mysqladmin password secret
+      mysqladmin password secret
 
    If you need to reset MySQL root password, then run the following command to reset the password of your choice::
 
-      sudo mysqladmin -u root -pcurrentpassword password 'newpassword'
+      mysqladmin -u root -pcurrentpassword password 'newpassword'
 
    Please note that there is no space between -p and currentpassword. Or change MySQL root password from MySQL prompt using UPDATE SQL command::
 
       mysql> UPDATE user SET password=PASSWORD('newpassword') WHERE user='root';
-      mysql> flush privileges;
-      mysql> exit;
+      mysql> FLUSH PRIVILEGES;
+      mysql> EXIT;
 
    Once you've changed it, make sure you can login with your new password successfully. And now kill your running MySQL deamon, then restart it normally.
 
-6. Rename ``tardis/tardis_portal/fixtures/initial_data.json`` to ignore importing synchrotron-specific metadata::
+6. Rename ``/opt/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to ignore importing synchrotron-specific schema::
 
-      cd mytardis/tardis/tardis_portal/fixtures/
+      cd /opt/mytardis/tardis/tardis_portal/fixtures/
       mv initial_data.json initial_data.json.ignored
 
-7. To configure MicroTardis for interactive use, modify the file ``bin/django`` and replace the following line::
+7. To configure MicroTardis for interactive use, modify the file ``/opt/mytardis/bin/django`` and replace the following line::
 
        djangorecipe.manage.main('tardis.test_settings')
 
@@ -182,11 +195,11 @@ Step 2: MicroTardis Database
     
        djangorecipe.manage.main('tardis.settings')
     
-   This means that the ``bin/django`` command will run the interactive configuration rather than the test configuration.
+   This means that the ``/opt/mytardis/bin/django`` command will run the interactive configuration rather than the test configuration.
 
 8. Run the following command to setup the database tables in the database::
 
-      cd mytardis
+      cd /opt/mytardis
       bin/django syncdb --noinput --migrate 
 
 
@@ -194,7 +207,7 @@ Step 3: MicroTardis Administrator
 ---------------------------------
 1. Create an administrator account::
 
-      cd mytardis
+      cd /opt/mytardis
       bin/django createsuperuser
 
 
@@ -205,57 +218,101 @@ application, and instead serve them directly through the webserver.
 
 1. To collect all the static files to a single directory::
 
-      cd mytardis
+      cd /opt/mytardis
       bin/django collectstatic
 
 
-Step 5: Apache and mod_wsgi
+Step 5: MicroTardis Staging Area and Store
+-------------------------------------
+If you need to use remote storage (mounted) staging/store area, please create symbolic links in ``/opt/mytardis/var`` to replace old staging and store directories.
+
+1. Create a symbolic link for *staging* area from MicroTardis to the remote storage::
+
+      cd /opt/mytardis/var
+      rmdir staging
+      ln -s /mnt/your_remote_staging staging
+    
+2. Create a symbolic link for *store* from MicroTardis to the remote storage::
+
+      cd /opt/mytardis/var
+      rmdir store
+      ln -s /mnt/your_remote_store store
+
+Step 6: Apache and mod_wsgi
 ---------------------------
-1. Create a symbolic link from MyTardis to standard ``/var/www`` structure (makes a fixed path for later changes)::
+1. Create a symbolic link from MyTardis to standard ``/var/www/html`` structure (makes a fixed path for later changes)::
 
-      cd /var/www
-      ln -s /path/to/mytardis mytardis
+      cd /var/www/html
+      chmod o+w /var/www/html
+      sudo -u apache ln -s /opt/mytardis mytardis
+      chmod o-w /var/www/html
+      
+2. Set up a virtual host for MicroTardis web portal by editing ``/etc/httpd/conf/httpd.conf`` file::
 
-2. Edit ``/etc/httpd/conf.d/wsgi.conf`` file::
+      <VirtualHost *:80>
+          ServerAdmin webmaster@localhost
+          DocumentRoot /var/www/html/mytardis
+          <Directory />
+              Options +FollowSymLinks
+              AllowOverride None
+          </Directory>
+          <Directory /var/www/html/mytardis>
+              Options Indexes +FollowSymLinks MultiViews
+              AllowOverride All
+              Order allow,deny
+              allow from all
+          </Directory>
+      </VirtualHost>
+
+3. Edit ``/etc/httpd/conf.d/wsgi.conf`` file::
 
       LoadModule wsgi_module modules/mod_wsgi.so
       <IfModule mod_wsgi.c>
           AddHandler wsgi-script .wsgi
-          Include /var/www/mytardis/apache/apache_django_wsgi.conf
+          Include /var/www/html/mytardis/apache/apache_django_wsgi.conf
       </IfModule>
   
-3. Create ``/var/www/mytardis/apache/apache_django_wsgi.conf`` file::
+4. Create ``apache_django_wsgi.conf`` file::
 
-      cd mytardis/apache
-      cp cp apache_django_wsgi.conf_changeme apache_django_wsgi.conf
+      cd /var/www/html/mytardis/apache/
+      cp apache_django_wsgi.conf_changeme apache_django_wsgi.conf
 
-4. Edit the ``/var/www/mytardis/apache/apache_django_wsgi.conf`` file as shown below::
+5. Edit the ``apache_django_wsgi.conf`` file as shown below::
 
-      Alias /static/ /var/www/mytardis/static/
-      <Directory /var/www/mytardis/static/>
+      Alias /static/ /var/www/html/mytardis/static/
+      <Directory /var/www/html/mytardis/static/>
       Order deny,allow
       Allow from all
       </Directory>
       
-      WSGIScriptAlias / "/var/www/mytardis/apache/django.wsgi"
+      WSGIScriptAlias / "/var/www/html/mytardis/apache/django.wsgi"
       
-      <Directory "/var/www/mytardis/apache">
+      <Directory "/var/www/html/mytardis/apache">
       Allow from all
       </Directory>
+      
+   Remember to delete or comment out all the original configuration in ``apache_django_wsgi.conf``::
+   
+      WSGIScriptAlias / "/Users/steve/django-jython-svn/myTARDIS_checkout/tardis/apache/django.wsgi"
+      
+      <Directory "/Users/steve/django-jython-svn/myTARDIS_checkout/tardis/apache">
+      Allow from all
+      </Directory>
+      
 
-5. Create ``/var/www/mytardis/apache/django.wsgi`` file::
+6. Create ``django.wsgi`` file::
   
-      cd mytardis/apache
+      cd /var/www/html/mytardis/apache/
       cp django.wsgi_changeme django.wsgi
   
-6. Edit the ``/var/www/mytardis/apache/django.wsgi`` file as shown below (Please copy the value of *sys.path* variable from ``mytardis/bin/django`` file)::
+7. Edit the ``django.wsgi`` file as shown below::
   
       #!/usr/bin/python
       
       import os
       import sys
       sys.path[0:0] = [
-          '/path/to/mytardis',
+          '/opt/mytardis',
           ...
           ]
       
@@ -263,7 +320,58 @@ Step 5: Apache and mod_wsgi
       import django.core.handlers.wsgi
       application = django.core.handlers.wsgi.WSGIHandler()
 
+   Please copy the value of *sys.path* variable from ``/opt/mytardis/bin/django.wsgi`` file.
+
+   Remember to delete or comment out the following line in ``django.wsgi`` file::
+   
+      sys.path.append('/Users/steve/django-jython-svn/myTARDIS_checkout')
+      
+   Also change the value of DJANGO_SETTINGS_MODULE environment variable so that it points to your project’s settings.py file if necessary.
+
+8. As root, make all file/directories in mytardis as group apache with *rx* access permission::
+
+      chgrp apache -R /opt/mytardis
+      chmod g+w mytardis
+      chmod g+rx -R /opt/mytardis
+      
+9. Set proper file access permission to ``/opt/mytardis/var``::
+
+      chmod g+rwx -R /opt/mytardis/var
+
+Step 7: SELinux
+---------------
+1. Disable SELinux protection in RHEL::
+
+      setenforce 0
 
 
+Step 8: Firewall Settings
+-------------------------
+1. Open flle ``/etc/sysconfig/iptables``::
 
-This is the minimum set of changes required to successfully run the server. You can make any other site-specific changes as necessary.
+      vi /etc/sysconfig/iptables
+ 
+2. Append rules as follows::
+
+      -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+      -A INPUT -m state --state NEW -p tcp --dport 443 -j ACCEPT
+ 
+3. Save and close the file. 
+4. Restart iptables::
+
+      /etc/init.d/iptables restart
+
+
+Step 9: MicroTardis Web Portal 
+------------------------------
+1. Restart Apache service::
+
+      /etc/init.d/httpd restart
+
+2. Check if MicroTardis Web Portal is working fine via browser with URL::
+
+      http://your.hostname.domain/
+      
+   For example::
+   
+      http://microtardis-test.eres.rmit.edu.au/
