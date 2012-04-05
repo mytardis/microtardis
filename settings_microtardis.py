@@ -8,18 +8,14 @@ DEBUG = False
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Database settings
-DATABASES = {
-    'default': {
-        # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'ENGINE': 'django.db.backends.sqlite3',
-        # Name of the database to use. For SQLite, it's the full path.
-        'NAME': '/var/www/tardis/db/tardis.sql',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
-}
+DATABASES = {}
+DATABASES['default'] = {}
+DATABASES['default']['ENGINE'] = 'django.db.backends.mysql'
+DATABASES['default']['HOST'] = 'localhost'
+DATABASES['default']['PORT'] = '3306'
+DATABASES['default']['NAME'] = 'microtardis'
+DATABASES['default']['USER'] = 'microtardis'
+DATABASES['default']['PASSWORD'] = 'secret'
 
 # Root URLs in MicroTardis
 ROOT_URLCONF = 'tardis.microtardis.urls'
@@ -47,8 +43,8 @@ POST_SAVE_FILTERS = [
     ]
 
 # Log files
-SYSTEM_LOG_FILENAME = '/home/rmmf/mytardis/var/log/request.log'
-MODULE_LOG_FILENAME = 'home/rmmf/mytardis/var/log/tardis.log'
+SYSTEM_LOG_FILENAME = '/var/www/html/mytardis/request.log'
+MODULE_LOG_FILENAME = '/var/www/html/mytardis/tardis.log'
 
 # Institution name
 DEFAULT_INSTITUTION = "RMIT Microscopy and Microanalysis Facility"
