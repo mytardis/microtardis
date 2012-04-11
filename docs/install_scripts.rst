@@ -1,2 +1,2 @@
-Installation of Facility Scripts
-================================
+Installation of Harvest Scripts
+===============================

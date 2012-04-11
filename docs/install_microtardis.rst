@@ -132,7 +132,7 @@ Configuring MicroTardis/MyTardis is done through a standard Django
 MicroTardis extensions. The following steps will lead you to have your own
 settings file for your deployment.
 
-1. Copy the file ``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` into the directory in which ``settings_changeme.py`` is::
+1. Copy the file ``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` into the directory where ``settings_changeme.py`` is in::
 
       cd /opt/mytardis/tardis
       cp microtardis/settings_microtardis.py settings.py
@@ -223,7 +223,7 @@ application, and instead serve them directly through the webserver.
 
 
 Step 5: MicroTardis Staging Area and Store
--------------------------------------
+------------------------------------------
 If you need to use remote storage (mounted) staging/store area, please create symbolic links in ``/opt/mytardis/var`` to replace old staging and store directories.
 
 1. Create a symbolic link for *staging* area from MicroTardis to the remote storage::
