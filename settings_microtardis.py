@@ -37,9 +37,9 @@ MIDDLEWARE_CLASSES = tuple(tmp)
 
 # Post Save Filters
 POST_SAVE_FILTERS = [
-    ("tardis.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://rmmf.isis.rmit.edu.au/schemas"]),
-    ("tardis.microtardis.filters.spctags.make_filter", ["EDAXGenesis_SPC","http://rmmf.isis.rmit.edu.au/schemas"]),
-    ("tardis.microtardis.filters.dattags.make_filter", ["HKLEDSD_DAT","http://rmmf.isis.rmit.edu.au/schemas"]),
+    ("tardis.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://exif.schema"]),
+    ("tardis.microtardis.filters.spctags.make_filter", ["EDAXGenesis_SPC","http://spc.schema"]),
+    ("tardis.microtardis.filters.dattags.make_filter", ["HKLEDSD_DAT","http://dat.schema"]),
     ]
 
 # Log files
