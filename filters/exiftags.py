@@ -248,7 +248,7 @@ class EXIFTagsFilter(object):
                                 # get Pixel Width for calculating magnification
                                 if section == "Scan" and option == "PixelWidth":
                                     pixel_width = float(value)
-                            except ConfigParser.NoSectionError:
+                            except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
                                 pass
                             
                         # Calculate Magnification
