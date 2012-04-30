@@ -19,5 +19,5 @@ curation of experiments for researcher access.
 System Framework
 ================
 
-.. image:: _static/Microtardis_deployment_January_2012.png
+.. image:: _static/Microtardis_deployment_June_2012.png
 
