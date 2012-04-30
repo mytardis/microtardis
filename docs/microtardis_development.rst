@@ -144,32 +144,36 @@ your own settings file for your developmnet server.
       DATABASES['default']['USER'] = ''
       DATABASES['default']['PASSWORD'] = ''
 
+4. Change the settings for location of log files in ``~/test/mytardis/tardis/settings.py`` file as shown below::
 
-4. Rename ``~/test/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to ignore importing synchrotron-specific schema::
+      SYSTEM_LOG_FILENAME = 'request.log'
+      MODULE_LOG_FILENAME = 'tardis.log'
+
+5. Rename ``~/test/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to ignore importing synchrotron-specific schema::
 
       cd ~/test/mytardis/tardis/tardis_portal/fixtures/
       mv initial_data.json initial_data.json.ignored
 
-5. Setup database tables in the database::
+6. Setup database tables in the database::
        
       cd ~/test/mytardis
       bin/django syncdb --noinput --migrate 
     
-6. Create an administrator account::
+7. Create an administrator account::
     
       cd ~/test/mytardis
       bin/django createsuperuser
     
-7. Start the development server::
+8. Start the development server::
 
       cd ~/test/mytardis
       bin/django runserver
 
-8. MicroTardis web portal should now be running at:
+9. MicroTardis web portal should now be running at:
 
    http://127.0.0.1:8000
 
-9. You now can log into `Django Administration Tool <https://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ with the administrator account you just created to do routin database maintenance:
+10. You can now log into `Django Administration Tool <https://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ with the administrator account you just created to do routin database maintenance:
 
    http://127.0.0.1:8000/admin
 
@@ -188,3 +192,24 @@ The file ``~/test/mytardis/tardis/microtardis/test_settings_microtardis.py`` is 
       cd ~/test/mytardis  
       bin/django test --settings=tardis.test_settings_microtardis
     
+
+Filters
+-------
+The **POST_SAVE_FILTERS** variable in ``~/test/mytardis/tardis/settings.py`` file 
+contains a list of post-save filters that are executed when a new DataFile 
+object is created and saved to the database. The MicroTardis Filters are built 
+upon the Django signal infrastrcture.
+
+1. The POST_SAVE_FILTERS variable is specified like::
+
+      POST_SAVE_FILTERS = [
+          ("tardis.microtardis.filters.exiftags.make_filter", ["MICROSCOPY_EXIF","http://exif.schema"]),
+          ("tardis.microtardis.filters.spctags.make_filter", ["EDAXGenesis_SPC","http://spc.schema"]),
+          ("tardis.microtardis.filters.dattags.make_filter", ["HKLEDSD_DAT","http://dat.schema"]),
+      ]
+2. The format they are specified in is::
+
+      (<filter class path>, [args], {kwargs})
+
+   Where *args* and *kwargs* are both optional.
+      
