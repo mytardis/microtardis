@@ -4,7 +4,7 @@
 Installing Your MicroTardis Instance
 ************************************
 
-This document describes how to install MicroTardis/MyTardis system.
+This document describes a step by step guide on how to install MicroTardis/MyTardis system.
 The documentation includes two main parts: the first part describes the installation
 of MyTardis system and MicroTardis extensions; and the second part describes 
 deploying MicroTardis within RMIT ITS network.
@@ -16,7 +16,9 @@ Installing MicroTardis
 
 Step 1: Prerequisites
 ---------------------
-MicroTardis is currently only supported on RHEL and Debian/Ubuntu with SELinux disabled.
+MicroTardis is currently only supported on RHEL and Ubuntu with SELinux disabled.
+
+**Please note that these installation instructions were written based on a RHEL 6 installation.**
 
 1. Redhat::
 
@@ -25,7 +27,7 @@ MicroTardis is currently only supported on RHEL and Debian/Ubuntu with SELinux d
       yum install cyrus-sasl-ldap cyrus-sasl-devel openldap-devel libxslt libxslt-devel libxslt-python
       easy_install PIL
 
-2. Debian/Ubuntu::
+2. Ubuntu::
 
       apt-get install git gcc libapache2-mod-wsgi mysql mysql-server python-mysqldb 
       apt-get instlal python python-dev python-setuptools python-numpy python-matplotlib
@@ -305,28 +307,73 @@ Step 6: Apache and mod_wsgi
       cd /var/www/html/mytardis/apache/
       cp django.wsgi_changeme django.wsgi
   
-7. Edit the ``django.wsgi`` file as shown below::
+7. Edit the ``django.wsgi`` file with instructions shown below followed by an example of django.wsgi.
   
-      #!/usr/bin/python
-      
-      import os
-      import sys
-      sys.path[0:0] = [
-          '/opt/mytardis',
-          ...
-          ]
-      
-      os.environ['DJANGO_SETTINGS_MODULE'] = 'tardis.settings'
-      import django.core.handlers.wsgi
-      application = django.core.handlers.wsgi.WSGIHandler()
+   a. Please copy the value of **sys.path** variable from ``/opt/mytardis/bin/django.wsgi`` file.
 
-   Please copy the value of *sys.path* variable from ``/opt/mytardis/bin/django.wsgi`` file.
-
-   Remember to delete or comment out the following line in ``django.wsgi`` file::
+   b. Remember to delete or comment out the following line in ``django.wsgi`` file::
    
-      sys.path.append('/Users/steve/django-jython-svn/myTARDIS_checkout')
+        sys.path.append('/Users/steve/django-jython-svn/myTARDIS_checkout')
       
-   Also change the value of DJANGO_SETTINGS_MODULE environment variable so that it points to your project’s settings.py file if necessary.
+   c. Also change the value of DJANGO_SETTINGS_MODULE environment variable so that it points to your project’s settings.py file if necessary.
+   
+   d. Example::
+   
+        #!/usr/bin/python
+      
+        import os
+        import sys
+        sys.path[0:0] = [
+            '/opt/mytardis',
+            '/opt/mytardis/eggs/nose-1.1.2-py2.6.egg',
+            '/opt/mytardis/eggs/coverage-3.4-py2.6-linux-x86_64.egg',
+            '/opt/mytardis/eggs/django_nose-1.0-py2.6.egg',
+            '/opt/mytardis/eggs/nosexcover-1.0.7-py2.6.egg',
+            '/opt/mytardis/eggs/python_ldap-2.4.9-py2.6-linux-x86_64.egg',
+            '/opt/mytardis/eggs/python_magic-0.4.0dev-py2.6.egg',
+            '/opt/mytardis/eggs/python_memcached-1.48-py2.6.egg',
+            '/opt/mytardis/eggs/pysolr-2.1.0_beta-py2.6.egg',
+            '/opt/mytardis/eggs/docutils-0.8.1-py2.6.egg',
+            '/opt/mytardis/eggs/flexmock-0.9.3-py2.6.egg',
+            '/opt/mytardis/eggs/compare-0.2b-py2.6.egg',
+            '/opt/mytardis/eggs/django_jasmine-0.3.2-py2.6.egg',
+            '/opt/mytardis/eggs/celery-2.5.1-py2.6.egg',
+            '/opt/mytardis/eggs/django_celery-2.5.1-py2.6.egg',
+            '/opt/mytardis/eggs/django_kombu-0.9.4-py2.6.egg',
+            '/opt/mytardis/eggs/iso8601-0.1.4-py2.6.egg',
+            '/opt/mytardis/eggs/html2text-3.200.3-py2.6.egg',
+            '/opt/mytardis/eggs/pyoai-2.4.4-py2.6.egg',
+            '/opt/mytardis/eggs/Wand-0.1.9-py2.6.egg',
+            '/opt/mytardis/eggs/djangorecipe-1.1.2-py2.6.egg',
+            '/opt/mytardis/eggs/Django-1.3-py2.6.egg',
+            '/opt/mytardis/eggs/zc.recipe.egg-1.3.2-py2.6.egg',
+            '/opt/mytardis/eggs/zc.buildout-1.5.2-py2.6.egg',
+            '/opt/mytardis/eggs/lxml-2.2.7-py2.6-linux-x86_64.egg',
+            '/opt/mytardis/eggs/django_picklefield-0.2.0-py2.6.egg',
+            '/opt/mytardis/eggs/ordereddict-1.1-py2.6.egg',
+            '/opt/mytardis/eggs/python_dateutil-1.5-py2.6.egg',
+            '/opt/mytardis/eggs/kombu-2.1.3-py2.6.egg',
+            '/opt/mytardis/eggs/anyjson-0.3.1-py2.6.egg',
+            '/opt/mytardis/eggs/importlib-1.0.2-py2.6.egg',
+            '/opt/mytardis/eggs/setuptools-0.6c12dev_r88846-py2.6.egg',
+            '/opt/mytardis/eggs/httplib2-0.7.4-py2.6.egg',
+            '/opt/mytardis/eggs/pytz-2012b-py2.6.egg',
+            '/opt/mytardis/eggs/South-0.7.4-py2.6.egg',
+            '/opt/mytardis/eggs/BeautifulSoup-3.2.1-py2.6.egg',
+            '/opt/mytardis/eggs/django_haystack-1.2.6-py2.6.egg',
+            '/opt/mytardis/eggs/django_form_utils-0.2.0-py2.6.egg',
+            '/opt/mytardis/eggs/django_extensions-0.8-py2.6.egg',
+            '/opt/mytardis/eggs/django_registration-0.8-py2.6.egg',
+            '/opt/mytardis/eggs/elementtree-1.2.7_20070827_preview-py2.6.egg',
+            '/opt/mytardis/eggs/feedparser-5.1.1-py2.6.egg',
+            '/opt/mytardis/eggs/amqplib-1.0.2-py2.6.egg',
+            '/opt/mytardis/parts/django',
+            ]
+      
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'tardis.settings'
+        import django.core.handlers.wsgi
+        application = django.core.handlers.wsgi.WSGIHandler()
+      
 
 8. As root, make all file/directories in mytardis as group apache with *rx* access permission::
 
