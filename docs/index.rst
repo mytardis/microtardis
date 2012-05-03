@@ -9,12 +9,12 @@ Welcome to MicroTardis's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    microtardis_overview
-   microtardis_administration
    microtardis_installation
    microtardis_development
+   microtardis_administration
 
 Indices and tables
 ==================

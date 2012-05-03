@@ -1,0 +1,27 @@
+""
+100,120.6719
+0
+4
+747,-10.36623,"Ni Kà"
+826,205.6338,"Ni Kß"
+86,123.6338,"Ni L"
+204,200.6338,"P K"
+"Gain",.9990636
+"Zero",1.124881
+"Cpspn",5210.04
+"MnRes",135.1587
+"Fano",.237969
+"Dead Time sec",.00005
+"KeV",25
+"Take Off Angle",35
+"Beam Current",1
+"Window Thickness",.00001
+"Sum Peak Factor",1
+"Escape Peak Factor",1
+"Peak Tailing",1
+"Au Layer Thickness",.000002
+"Dead Layer Thickness",.00001
+"Detector width",.3
+"Carbon Film",0
+"Last Saved 06-December-11 18:12:20"
+"RMIT"

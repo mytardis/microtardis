@@ -96,3 +96,7 @@ FILTER_MIDDLEWARE = (("tardis.microtardis.filters","FilterInitMiddleware"),)
 
 # URL for EMBS authentication
 EMBS_URL = "http://embs.rmit.edu.au/auth.php?"
+
+# Staging Area and Data Store
+#STAGING_PATH = '/directory/path/of/your/own/staging'
+#FILE_STORE_PATH = '/directory/path/of/your/own/store'

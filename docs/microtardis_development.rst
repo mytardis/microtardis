@@ -10,31 +10,44 @@ The `microtardis <microtardis@googlegroups.com>`_ email list is used for
 communication between developers. To join this list, fill in the form on the 
 `Contact owner to join <http://groups.google.com/group/microtardis/post?sendowner=1>`_ page.
 
+Issue Trackers
+--------------
+1. The main entry point for users and system administrator is `microtardis <microtardis@googlegroups.com>`_ email list.
+2. Defects and issues found in the MicroTardis software are tracked using the `MyTardis Lighthouse <mytardis.lighthouseapp.com>`_ tracker.
 
 Software Repository
 -------------------
-The GitHub service is used for the software repository and can be browsed using 
+The GitHub service is used for MicroTardis software repository and can be browsed using 
 the `GitHub Source-code Browser <https://github.com/mytardis/microtardis>`_. 
 For write access to the repository, email the `microtardis <microtardis@googlegroups.com>`_ 
 list. The software can be checked out with the following command::
 
-    git clone https://username@github.com/mytardis/mytardis.git
+    git clone https://username@github.com/mytardis/microtardis.git
 
-For anonymous checkouts the following command can be used::
+For anonymous checkouts, the following command can be used::
 
-    git clone https://github.com/mytardis/mytardis.git
-
-Get the release branch you want to check out. Release branches could be: 
-*2.5.0-rc1*, *mecat-ansto-dec2011*, *mecat-as-dec2011*, etc. Example::
-
-      cd mytardis
-      git tag -l
-      git checkout 2.5.0-rc1
+    git clone https://github.com/mytardis/microtardis.git
 
 
 Installation
 ------------
-1. Prerequisites
+
+1. Set RMIT Proxy
+      
+   If you would like to install MicroTardis in a RMIT machine, it's needed to have RMIT HTTP/HTTPS proxy settings to access the Internet. 
+   
+   * Copy the following lines into ``/etc/environment`` with root permission to have system-wide proxy settings::
+   
+      http_proxy=http://bproxy.rmit.edu.au:8080
+      https_proxy=http://bproxy.rmit.edu.au:8080   
+   
+   * Save the file and re-login. 
+   * To make sure the setting is there by opening a terminal and issuing the command::
+
+      export | grep -i proxy
+
+
+2. Prerequisites
 
    * Redhat::
 
@@ -50,22 +63,6 @@ Installation
       apt-get install libpq-dev libssl-dev libsasl2-dev libldap2-dev libxslt1.1 libxslt1-dev python-libxslt1 libexiv2-dev
       easy_install PIL
       
-      
-2. Set RMIT Proxy
-      
-   If you would like to install MicroTardis in a RMIT machine, it's needed to have RMIT HTTP/HTTPS proxy settings to access the Internet. 
-   
-   * Copy the following lines into ``/env/environment`` with root permission to have system-wide proxy settings::
-   
-      HTTP_PROXY=http://bproxy.rmit.edu.au:8080
-      http_proxy=http://bproxy.rmit.edu.au:8080
-      HTTPS_PROXY=http://bproxy.rmit.edu.au:8080
-      https_proxy=http://bproxy.rmit.edu.au:8080   
-   
-   * Save the file and re-login. 
-   * To make sure the setting is there by opening a terminal and issuing the command::
-
-      export | grep -i proxy
    
 3. Download MyTardis and MicroTardis Extensions
    
@@ -73,12 +70,12 @@ Installation
    
       mkdir ~/test
 
-   * Check out MyTardis Source Code::
+   * Check out latest version of MyTardis Source Code::
    
       cd ~/test
       git clone https://github.com/mytardis/mytardis.git
 
-   * Check out MicroTardis Extensions::
+   * Check out latest version of MicroTardis Extensions::
    
       cd ~/test/mytardis/tardis
       git clone https://github.com/mytardis/microtardis.git
@@ -212,4 +209,12 @@ upon the Django signal infrastrcture.
       (<filter class path>, [args], {kwargs})
 
    Where *args* and *kwargs* are both optional.
+      
+      
+      
+    FEI Quanta 200 (.tif)
+    FEI Nova NanoSEM 200 (.tif)
+    EDAX Genesis spectrum file (.spc)
+    Moran Scientific spectrum file (.spt)
+    Philips XL30 (.tif) - under development as of January 2012
       
