@@ -10,6 +10,11 @@ The `microtardis <microtardis@googlegroups.com>`_ email list is used for
 communication between developers. To join this list, fill in the form on the 
 `Contact owner to join <http://groups.google.com/group/microtardis/post?sendowner=1>`_ page.
 
+Alternatively, `tardis-devel <tardis-devel@googlegroups.com>`_ email list is the
+one you can use to contact MyTardis community. New contributors are welcome, 
+however all developers should review the `pull-request checklist <https://github.com/mytardis/mytardis/wiki/Pull-Request-Checklist>`_ before making pull requests.
+
+
 Issue Trackers
 --------------
 1. The main entry point for users and system administrator is `microtardis <microtardis@googlegroups.com>`_ email list.

@@ -463,7 +463,7 @@ Step 6: Apache and mod_wsgi
         application = django.core.handlers.wsgi.WSGIHandler()
       
 
-8. As root, make all file/directories in mytardis as group apache with *rx* access permission::
+8. As root, make all file/directories in mytardis as group *apache* with *rx* access permission::
 
       chgrp apache -R /opt/mytardis
       chmod g+w /opt/mytardis
@@ -538,7 +538,7 @@ Step 9: MicroTardis Web Portal
 
 4. Check if MicroTardis Web Portal is working fine via browser with URL::
 
-      http://your_hostname.domainname/
+      http://your_hostname.domain_name/
       
    For example::
    

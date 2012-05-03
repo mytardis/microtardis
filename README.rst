@@ -16,6 +16,7 @@ curation of experiments for researcher access.
 Documentation
 -------------
 Installation, User and Developer Manuals are available at http://microtardis.readthedocs.org
+
 1. MicroTardis Installation Guide
    http://microtardis.readthedocs.org/en/latest/microtardis_installation.html
 2. MicroTardis Development Guide
@@ -27,8 +28,12 @@ Installation, User and Developer Manuals are available at http://microtardis.rea
 Communication
 -------------
 The `microtardis <microtardis@googlegroups.com>`_ email list is used for 
-communication between developers. To join this list, fill in the form on the 
+communication between developers in MicroTardis project. To join this list, fill in the form on the 
 `Contact owner to join <http://groups.google.com/group/microtardis/post?sendowner=1>`_ page.
+
+Alternatively, `tardis-devel <tardis-devel@googlegroups.com>`_ email list is the
+one you can use to contact MyTardis community. New contributors are welcome, 
+however all developers should review the `pull-request checklist <https://github.com/mytardis/mytardis/wiki/Pull-Request-Checklist>`_ before making pull requests.
 
 
 Issue Trackers
