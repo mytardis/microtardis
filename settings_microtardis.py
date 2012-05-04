@@ -43,8 +43,9 @@ POST_SAVE_FILTERS = [
     ]
 
 # Log files
-SYSTEM_LOG_FILENAME = '/var/www/html/mytardis/request.log'
-MODULE_LOG_FILENAME = '/var/www/html/mytardis/tardis.log'
+SYSTEM_LOG_FILENAME = path.abspath(path.join(path.dirname(__file__), '../request.log')).replace('\\', '/')
+MODULE_LOG_FILENAME = path.abspath(path.join(path.dirname(__file__), '../tardis.log')).replace('\\', '/')
+
 
 # Institution name
 DEFAULT_INSTITUTION = "RMIT Microscopy and Microanalysis Facility"
