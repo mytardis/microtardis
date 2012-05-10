@@ -10,4 +10,4 @@ scripts.
    :maxdepth: 2
 
    install_microtardis
-   install_scripts
+   install_autoingest_at_rmmf
