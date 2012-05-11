@@ -6,11 +6,11 @@ This document describes information for MicroTardis developers.
 
 Communication
 -------------
-1. The `microtardis <microtardis@googlegroups.com>`_ email list is used for 
+#. The `microtardis <microtardis@googlegroups.com>`_ email list is used for 
    communication between developers. To join this list, fill in the form on the 
    `Contact owner to join <http://groups.google.com/group/microtardis/post?sendowner=1>`_ 
    page.
-2. Alternatively, `tardis-devel <tardis-devel@googlegroups.com>`_ email list is 
+#. Alternatively, `tardis-devel <tardis-devel@googlegroups.com>`_ email list is 
    the one you can use to contact MyTardis/MicroTardis community. New 
    contributors are welcome, however all developers should review the 
    `pull-request checklist <https://github.com/mytardis/mytardis/wiki/Pull-Request-Checklist>`_ 
@@ -19,46 +19,52 @@ Communication
 
 Issue Trackers
 --------------
-1. The main entry point for users and system administrator is 
+#. The main entry point for users and system administrator is 
    `microtardis <microtardis@googlegroups.com>`_ email list.
-2. Defects and issues found in the MicroTardis software are tracked using the 
-   `MyTardis Lighthouse <mytardis.lighthouseapp.com>`_ tracker.
+#. Defects and issues found in the MicroTardis software are tracked using the 
+   `MyTardis Lighthouse <http://mytardis.lighthouseapp.com>`_ tracker.
 
 Software Repositories
 ---------------------
-The GitHub service is used for MicroTardis software repository and can be 
-browsed using the `GitHub Source-code Browser <https://github.com/mytardis/microtardis>`_. 
+#. The GitHub service is used for MicroTardis software repository and can be 
+   browsed using the GitHub source-code browser,
 
-For write access to the repository, email the `microtardis <microtardis@googlegroups.com>`_ 
-list. 
+   a. `MyTardis at GitHub <https://github.com/mytardis/mytardis>`_ 
+   b. `MicroTardis at GitHub <https://github.com/mytardis/microtardis>`_
 
-1. MyTardis software repository
+#. **For write access (git push permission) to the MicroTardis repository, email 
+   the** `microtardis <microtardis@googlegroups.com>`_ **list.**
 
-   The software can be checked out with the following command::
-
-     git clone https://github.com/mytardis/mytardis.git
-
-2. MicroTardis software repository
-
-   If you are a contributor to MicroTardis software, please create your personal
-   account in `GitHub <https://github.com/signup/free>`_, and send your account
+   If you are a contributor to MicroTardis software, please create your personal 
+   account in `GitHub <https://github.com/signup/free>`_, and send your account 
    name to `microtardis <microtardis@googlegroups.com>`_ asking for pull and 
    push permissions to MicroTardis GitHub repository.
-   
-   The software can be checked out with the following command::
 
-     git clone https://username@github.com/mytardis/microtardis.git
+#. Check out code from GitHub
 
-   For anonymous checkouts, the following command can be used::
+   a. MyTardis software repository
 
-     git clone https://github.com/mytardis/microtardis.git
+      The software can be checked out with the following command::
 
-Installation
-------------
+        git clone https://github.com/mytardis/mytardis.git
 
-1. Internet Proxy Settings if Within RMIT Network
+   b. MicroTardis software repository
 
-   **Please skip this step if your machine isn't hosted within RMIT network.**
+      The software can be checked out with the following command::
+
+        git clone https://username@github.com/mytardis/microtardis.git
+
+      For anonymous checkouts, the following command can be used::
+
+        git clone https://github.com/mytardis/microtardis.git
+
+Setup Local Development Environment
+-----------------------------------
+
+#. Internet Proxy Settings if Within RMIT Network
+
+   **Please skip this step if your development machine isn't hosted within RMIT 
+   network.**
       
    If you would like to install MicroTardis in a RMIT machine, it's required to 
    have RMIT HTTP/HTTPS proxy settings to access the Internet. 
@@ -77,7 +83,10 @@ Installation
 
      then you should see the proxy settings as what you have just configured.
 
-2. Prerequisites
+#. Prerequisites
+
+   MicroTardis is currently only supported on RHEL and Ubuntu. The following 
+   packages are essential to be system-wide installed. 
 
    * Redhat::
 
@@ -94,14 +103,16 @@ Installation
       easy_install PIL
       
    
-3. Download MyTardis and MicroTardis Extensions
-   
+#. Download MyTardis Source code
+
    * Choose a folder to install MyTardis. For example, your home directory.
    * Check out latest version of MyTardis Source Code::
    
       cd ~
       git clone https://github.com/mytardis/mytardis.git
 
+#. Download MicroTardis Extensions
+   
    * Check out latest version of MicroTardis Extensions::
    
       cd ~/mytardis/tardis
@@ -110,53 +121,48 @@ Installation
      The ``microtardis`` directory should be the same level as the 
      ``tardis_portal`` directory.
      
-4. Building
+#. Use Buildout to set up a development environment 
       
-   MicroTardis/MyTardis is using the Buildout build system to handle the 
-   installation of dependencies and create the python class path.
+   MicroTardis/MyTardis uses the Buildout Python-based build system to 
+   automatically create, assemble and deploy applications or modules required 
+   by MicroTardis/MyTardis project to build a local development environment. It 
+   would automatically download and install the modules and their dependencies
+   inside ``/opt/mytardis`` directory. Please note that this is not a 
+   system-wide installation. Buildout uses a Python tool called setuptools 
+   internally to install the packages. 
    
-   * Run the Buildout bootstrap script to initialise Buildout::
-
+   * Run the bootstrap script to bootstrap a buildout-based project::
+   
       cd ~/mytardis
       python bootstrap.py
       
-   * Download and build Django and all dependencies::
+   * Run the buildout script to download and install Python eggs and all 
+     dependencies::
       
       cd ~/mytardis
       bin/buildout
       
      *This can be run again at any time to check for and download any new 
      dependencies.*
-     
-     If you get an error from getting distribution for 'coverage==3.4'. Please 
-     replace the following line in *eggs* directive under *buildout* section in 
-     ``~/mytardis/buildout.cfg`` file::
-
-      coverage==3.4
-
-     with::
-
-      coverage  
       
-      
-Configuration
--------------
-Configuring MicroTardis/MyTardis is done through a standard Django 
-*settings.py* file. MyTardis comes with a sample configuration file at 
-``~/mytardis/tardis/settings_changeme.py``. The file 
-``~/mytardis/tardis/microtardis/settings_microtardis.py`` is an alternative
-of ``~/mytardis/tardis/settings_changeme.py`` for MyTardis that includes 
-support for MicroTardis extensions. The following steps will lead you to have 
-your own settings file for your developmnet server.
+#. Create settings.py file
 
-1. Copy the file ``~/mytardis/tardis/microtardis/settings_microtardis.py`` into 
-   the directory where ``settings_changeme.py`` is in::
+   Configuring MicroTardis/MyTardis is done through a standard Django 
+   *settings.py* file. MyTardis comes with a sample configuration file at 
+   ``~/mytardis/tardis/settings_changeme.py``. In MicroTardis, there is also a 
+   settings file called ``~/mytardis/tardis/microtardis/settings_microtardis.py`` 
+   which is an extension of ``~/mytardis/tardis/settings_changeme.py`` that 
+   includes support to MicroTardis application. 
+   
+   To create a settings.py file in your developmnet server, just copy the file 
+   ``~/mytardis/tardis/microtardis/settings_microtardis.py`` into the directory 
+   where ``settings_changeme.py`` is in::
 
-      cd ~/mytardis/tardis
-      cp microtardis/settings_microtardis.py settings.py
+      cp ~/mytardis/tardis/microtardis/settings_microtardis.py ~/mytardis/tardis/settings.py
 
-2. To configure MicroTardis for interactive use, modify the file 
-   ``~/mytardis/bin/django`` and replace::
+#. To configure MicroTardis for interactive use to proceed following part of
+   configuration, please edit the file ``~/mytardis/bin/django`` and replace the
+   following line::
 
       djangorecipe.manage.main('tardis.test_settings')
     
@@ -165,10 +171,12 @@ your own settings file for your developmnet server.
       djangorecipe.manage.main('tardis.settings')
     
    This means that the ``~/mytardis/bin/django`` command will run the 
-   interactive configuration rather than the test configuration.
+   interactive configuration rather than the test configuration. And we will use
+   this command later on to manually create database tables or superuser, and so 
+   on.
 
-3. To configure database for development purpose, edit the database settings in 
-   ``~/mytardis/tardis/settings.py`` file as shown below::
+#. To configure database for development purpose, edit the database settings 
+   in ``~/mytardis/tardis/settings.py`` file as shown below::
 
       DATABASES = {}
       DATABASES['default'] = {}
@@ -179,23 +187,27 @@ your own settings file for your developmnet server.
       DATABASES['default']['USER'] = ''
       DATABASES['default']['PASSWORD'] = ''
 
-4. Rename ``~/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to 
-   ignore importing synchrotron-specific schema::
+#. Rename ``~/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to 
+   ignore importing synchrotron-specific metadata schema::
 
       cd ~/mytardis/tardis/tardis_portal/fixtures/
       mv initial_data.json initial_data.json.ignored
 
-5. Setup database tables in the SQLite database::
+   The synchrotron-specific metadata schema is part of default schema in 
+   MyTardis 2.5 release branch. However MicroTardis doesn't use it for 
+   microscopy metadata data. 
+
+#. Setup database tables in the SQLite database::
        
       cd ~/mytardis
       bin/django syncdb --noinput --migrate 
     
-6. Create an administrator account::
+#. Create an administrator account::
     
       cd ~/mytardis
       bin/django createsuperuser
     
-7. Setup MicroTardis staging area and data store
+#. Setup MicroTardis staging area and data store
 
    In MyTardis/MicroTardis, **staging area** is an intermediate data storage 
    area between the sources of raw data and the MyTardis/MicroTardis 
@@ -250,7 +262,7 @@ your own settings file for your developmnet server.
         cd ~/mytardis/var/staging/your_username
         mkdir NovaNanoSEM
 
-8. Copy microscope example files into your microscope folders. Here are some 
+#. Copy microscope example files into your microscope folders. Here are some 
    example files for you to download,
    
    a. XL30
@@ -275,17 +287,17 @@ your own settings file for your developmnet server.
    on `MicroTardis Create Experiment <http://127.0.0.1:8000/experiment/create/>`_ 
    web interface later after you successfully start your development server.
     
-9. Start the development server::
+#. Start the development server::
 
       cd ~/mytardis
       bin/django runserver
 
-10. MicroTardis web portal should now be running at:
+#. MicroTardis web portal should now be running at:
 
    http://127.0.0.1:8000
 
-11. You can now log into `Django Administration Tool <https://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ 
-    with the administrator account you just created to do routin database maintenance:
+#. You can now log into `Django Administration Tool <https://docs.djangoproject.com/en/dev/intro/tutorial02/>`_ 
+   with the administrator account you just created to do routin database maintenance:
 
    http://127.0.0.1:8000/admin
 
@@ -366,3 +378,11 @@ upon the Django signal infrastrcture.
    |                     |                |                  |             | in views.py     | (in CSV format)           |
    +---------------------+----------------+------------------+-------------+-----------------+---------------------------+
       
+User Registration
+-----------------
+
+MicroTardis is integrated with 
+`RMMF Booking System (EMBS) <http://embs.set.rmit.edu.au/mebookings.php>`_ 
+authentication module that automatically creates new user accounts for RMMF 
+users when they first login to MicroTardis web interface using the same username
+and password in EMBS.
