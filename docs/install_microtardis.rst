@@ -27,14 +27,14 @@ Step 1: Internet Proxy Settings if Within RMIT Network
 If you would like to install MicroTardis in a RMIT machine, it's required to 
 have RMIT HTTP/HTTPS proxy settings to access the Internet. 
 
-1. Copy the following lines into ``/etc/environment`` with root permission to 
+#. Copy the following lines into ``/etc/environment`` with root permission to 
    have system-wide proxy settings::
    
       http_proxy=http://bproxy.rmit.edu.au:8080
       https_proxy=http://bproxy.rmit.edu.au:8080   
    
-2. Save the file and re-login. 
-3. To make sure the setting is there by opening a terminal and issuing the 
+#. Save the file and re-login. 
+#. To make sure the setting is there by opening a terminal and issuing the 
    command::
 
       export | grep -i proxy
@@ -44,16 +44,17 @@ have RMIT HTTP/HTTPS proxy settings to access the Internet.
 
 Step 2: Prerequisites
 ---------------------
-MicroTardis is currently only supported on RHEL and Ubuntu with SELinux disabled.
+MicroTardis is currently only supported on RHEL and Ubuntu with SELinux 
+disabled. The following packages are essential to be system-wide installed. 
 
-1. Redhat::
+#. Redhat::
 
       yum install git gcc gcc-c++ httpd mod_wsgi mysql mysql-server MySQL-python 
       yum install python python-devel python-setuptools libjpeg-devel numpy python-matplotlib
       yum install cyrus-sasl-ldap cyrus-sasl-devel openldap-devel libxslt libxslt-devel libxslt-python
       easy_install PIL
 
-2. Ubuntu::
+#. Ubuntu::
 
       apt-get install git gcc libapache2-mod-wsgi mysql mysql-server python-mysqldb 
       apt-get instlal python python-dev python-setuptools python-numpy python-matplotlib
@@ -63,38 +64,55 @@ MicroTardis is currently only supported on RHEL and Ubuntu with SELinux disabled
     
 Step 3: Download MyTardis Source Code
 -------------------------------------
-1. Get the **MyTardis 2.5 release branch** and check out the source code into
-   ``/opt/`` directory::
+#. Check out MyTardis source code into ``/opt/`` directory::
 
       cd /opt
       git clone git://github.com/mytardis/mytardis.git
-      cd mytardis
-      git tag -l
-      git checkout 2.5.0-rc1
 
-2. If you get *an error of connection timed out* as shown below::
+   If you get an error of **Connection timed out** as shown below::
 
       Initialized empty Git repository in /opt/mytardis/.git/
       github.com[0: 207.97.227.239]: errno=Connection timed out
       fatal: unable to connect a socket (Connection timed out)
 
-   Please use the following commands instead (cloning GitHub repository over 
-   HTTP/HTTPS)::
+   It means that the git port (9418) might be blocked due to a firewall 
+   constraint. Please try the following commands to clone GitHub repository over 
+   HTTP/HTTPS instead::
 
       cd /opt
       git config --global http.proxy bproxy.rmit.edu.au:8080
       git clone https://github.com/mytardis/mytardis.git
+
+
+   It might be slow and recommended to be used if the git port(9418) is blocked.
+
+#. Get the **MyTardis 2.5 release branch**::
+
       cd mytardis
       git tag -l
       git checkout 2.5.0-rc1
 
-   It might be slow and recommended to be used if the git port(9418) is blocked 
-   due to a firewall constraint.
+   then you will see messages similar to the one below::
+   
+      Note: checking out '2.5.0-rc1'.
 
+      You are in 'detached HEAD' state. You can look around, make experimental
+      changes and commit them, and you can discard any commits you make in this
+      state without impacting any branches by performing another checkout.
+
+      If you want to create a new branch to retain commits you create, you may
+      do so (now or later) by using -b with the checkout command again. Example:
+
+        git checkout -b new_branch_name
+
+      HEAD is now at 9615e03... Merge pull request #64 from shaunokeefe/sync-rebased
+      
+   it means that you have checked out '2.5.0-rc1' branch successfully.
+    
 
 Step 4: Download MicroTardis Extensions
 ---------------------------------------
-1. To get the current master branch of MicroTardis and install it inside 
+#. To get the current master branch of MicroTardis and install it inside 
    MyTardis folder::
 
       cd /opt/mytardis/tardis
@@ -103,34 +121,30 @@ Step 4: Download MicroTardis Extensions
    The ``microtardis`` directory should be the same level as the 
    ``tardis_portal`` directory.
    
+   
 Step 5: Building
 ---------------------------
 
-MicroTardis/MyTardis is using the Buildout build system to handle the 
-installation of dependencies and create the python class path.
+MicroTardis/MyTardis uses the Buildout Python-based build system to 
+automatically create, assemble and deploy applications or modules required 
+by MicroTardis/MyTardis project. It would automatically download and install the 
+modules and their dependencies inside ``/opt/mytardis`` directory. Please note 
+that this is not a system-wide installation. Buildout uses a Python tool called 
+setuptools internally to install the packages. 
    
-1. Run the Buildout bootstrap script to initialise Buildout::
+#. Run the bootstrap script to bootstrap a buildout-based project::
 
       cd /opt/mytardis
       python bootstrap.py
    
-2. Download and build Django and all dependencies::
+#. Run the buildout script to download and install Python eggs and all 
+   dependencies::
 
       cd /opt/mytardis
       bin/buildout
    
    *This can be run again at any time to check for and download any new 
    dependencies.* 
-
-   If you get an error from getting distribution for 'coverage==3.4'. Please 
-   replace the following line in *eggs* directive under *buildout* section in 
-   ``/opt/mytardis/buildout.cfg`` file::
-
-      coverage==3.4
-
-   with::
-
-      coverage
    
 Deploying MicroTardis
 =====================
@@ -138,38 +152,55 @@ Deploying MicroTardis
 Step 1: MicroTardis settings.py File
 ------------------------------------
 
-Configuring MicroTardis/MyTardis is done through a standard Django 
-*settings.py* file. MyTardis comes with a sample configuration file at 
-``/opt/mytardis/tardis/settings_changeme.py``. The file 
-``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` is an example of 
-``/opt/mytardis/tardis/settings_changeme.py`` for MyTardis that includes support
-for MicroTardis extensions. The following steps will lead you to have your own
-settings file for your deployment.
+Configuring MicroTardis/MyTardis is done through a standard Django *settings.py* 
+file. MyTardis comes with a sample configuration file at 
+``/opt/mytardis/tardis/settings_changeme.py``. In MicroTardis, there is also a
+settings file called ``/opt/mytardis/tardis/microtardis/settings_microtardis.py``  
+which is an extension of ``/opt/mytardis/tardis/settings_changeme.py`` that 
+includes support to MicroTardis application. 
+   
+#. To create a settings.py file for your deployment, just copy the file 
+   ``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` into the 
+   directory where ``settings_changeme.py`` is in::
 
-1. Copy the file ``/opt/mytardis/tardis/microtardis/settings_microtardis.py`` 
-   into the directory where ``settings_changeme.py`` is in::
+      cp /opt/mytardis/tardis/microtardis/settings_microtardis.py /opt/mytardis/tardis/settings.py
 
-      cd /opt/mytardis/tardis
-      cp microtardis/settings_microtardis.py settings.py
+#. To configure MicroTardis for interactive use to proceed following part of 
+   configuration, please edit the file ``/opt/mytardis/bin/django`` and replace 
+   the following line::
 
+       djangorecipe.manage.main('tardis.test_settings')
+
+   with::
+    
+       djangorecipe.manage.main('tardis.settings')
+    
+   This means that the ``/opt/mytardis/bin/django`` command will run the 
+   interactive configuration rather than the test configuration. And we will use
+   this command later on to manually create database tables or superuser, and so 
+   on.
 
 Step 2: MicroTardis Database
 ----------------------------
-1. Ensure that the MySQL database has been started::
+#. Ensure that the MySQL database has been started::
    
       /etc/init.d/mysqld start
    
-2. Configure MySQL to run every time the system starts::
+#. Configure MySQL to run every time the system starts::
 
       chkconfig mysqld on
 
-3. Run the following command to configure the database; don't forget to replace 
-   *'secret'* with a password of your choice::
+#. Create a database named **microtardis**::
 
       mysql -e "CREATE DATABASE microtardis"
-      mysql -e "GRANT ALL PRIVILEGES ON microtardis.* TO 'microtardis'@'localhost' IDENTIFIED BY 'secret';"
+      
+#. Run the following command to configure the database, and create user account
+   and password; don't forget to replace **'microtardisuser'** and **'secret'** 
+   with a user name and a password of your choices::
+
+      mysql -e "GRANT ALL PRIVILEGES ON microtardis.* TO 'microtardisuser'@'localhost' IDENTIFIED BY 'secret';"
    
-4. Edit the ``/opt/mytardis/tardis/settings.py`` file and ensure that 
+#. Edit the ``/opt/mytardis/tardis/settings.py`` file and ensure that 
    DATABASE_PASSWORD and other database parameters match the values used to 
    create the MicroTardis database::
 
@@ -179,26 +210,27 @@ Step 2: MicroTardis Database
       DATABASES['default']['HOST'] = 'localhost'
       DATABASES['default']['PORT'] = '3306'
       DATABASES['default']['NAME'] = 'microtardis'
-      DATABASES['default']['USER'] = 'microtardis'
+      DATABASES['default']['USER'] = 'microtardisuser'
       DATABASES['default']['PASSWORD'] = 'secret'
       
    This is the minimum set of changes required to successfully run the server. 
    You can make any other site-specific changes in 
    ``/opt/mytardis/tardis/settings.py`` as necessary.
 
-5. Run the following command to ensure that the MySQL instance has a root 
-   password; don't forget to replace the word *'secret'* with a password of your
-   choice::
+#. (OPTIONAL) For the purpose of database maintenance, you might need to have 
+   root access to MySQL database. If you have root access, run the following 
+   command to ensure that the MySQL instance has a root password; don't forget 
+   to replace the word *'rootsecret'* with a password of yours::
 
-      mysqladmin password secret
+      mysqladmin password rootsecret
 
    If you need to reset MySQL root password, then run the following command to 
    reset the password of your choice::
 
       mysqladmin -u root -pcurrentpassword password 'newpassword'
 
-   Please note that there is no space between -p and currentpassword. Or change 
-   MySQL root password from MySQL prompt using UPDATE SQL command::
+   Please note that there is no space between **-p** and **currentpassword**. Or 
+   change MySQL root password from MySQL prompt using UPDATE SQL command::
 
       mysql> UPDATE user SET password=PASSWORD('newpassword') WHERE user='root';
       mysql> FLUSH PRIVILEGES;
@@ -207,25 +239,17 @@ Step 2: MicroTardis Database
    Once you've changed it, make sure you can login with your new password 
    successfully. And now kill your running MySQL deamon, then restart it normally.
 
-6. Rename ``/opt/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to 
-   ignore importing synchrotron-specific schema::
+#. Rename ``/opt/mytardis/tardis/tardis_portal/fixtures/initial_data.json`` to 
+   ignore importing synchrotron-specific metadata schema::
 
       cd /opt/mytardis/tardis/tardis_portal/fixtures/
       mv initial_data.json initial_data.json.ignored
+      
+   The synchrotron-specific metadata schema is part of default schema in 
+   MyTardis 2.5 release branch. However MicroTardis doesn't use it for 
+   microscopy metadata data. 
 
-7. To configure MicroTardis for interactive use, modify the file 
-   ``/opt/mytardis/bin/django`` and replace the following line::
-
-       djangorecipe.manage.main('tardis.test_settings')
-
-   with::
-    
-       djangorecipe.manage.main('tardis.settings')
-    
-   This means that the ``/opt/mytardis/bin/django`` command will run the 
-   interactive configuration rather than the test configuration.
-
-8. Run the following command to setup the database tables in the MySQL database::
+#. Run the following command to setup the database tables in the MySQL database::
 
       cd /opt/mytardis
       bin/django syncdb --noinput --migrate 
@@ -254,7 +278,7 @@ Step 4: Static Files
 For performance reasons you should avoid static files being served via the 
 application, and instead serve them directly through the webserver.
 
-1. To collect all the static files to a single directory::
+#. To collect all the static files to a single directory::
 
       cd /opt/mytardis
       bin/django collectstatic
@@ -271,7 +295,7 @@ With respect to the solution of automatic data collection on staging area,
 please see an example of `RMIT MicroTardis Data Harvest <http://microtardis.readthedocs.org/en/latest/install_scripts.html>`_ 
 for more details.
 
-1. The default location of staging area or data store is in ``mytardis/var``. 
+#. The default location of staging area or data store is in ``mytardis/var``. 
    If you have followed the installation instructions above, you should be able 
    to see them:: 
 
@@ -280,7 +304,7 @@ for more details.
 
    and both of them are empty directories.
    
-2. Specify directory paths of your own staging area and data store if you would 
+#. Specify directory paths of your own staging area and data store if you would 
    like to change the locations of them instead of using the default ones 
    (*Optional*).
  
@@ -296,7 +320,7 @@ for more details.
    c. Uncomment the line and specify the location of your own staging area or 
       data store.
 
-3. Set up remote staging area and data store (*Optional*).
+#. Set up remote staging area and data store (*Optional*).
 
    If you need to use remote or mounted staging/store area, please create 
    symbolic links in ``/opt/mytardis/var`` to replace default staging and store
@@ -316,12 +340,12 @@ for more details.
         rmdir store
         ln -s /mnt/your_remote_store store
 
-4. In MicroTardis, data store is a file storage to keep ingested files with a 
+#. In MicroTardis, data store is a file storage to keep ingested files with a 
    specific file directory structure. In this part you are not expected to 
    change or modify any data in MicroTardis data store including files and 
    directories.
 
-5. Create **MicroTardis Staging Structure** for data ingestion from staging area 
+#. Create **MicroTardis Staging Structure** for data ingestion from staging area 
    into data store.
 
    You are required to manually create a **staging structure** with a predefined
@@ -354,7 +378,7 @@ for more details.
         cd /opt/mytardis/var/staging/your_username
         mkdir NovaNanoSEM
 
-6. Copy example files into your microscope folders. Here are some example files 
+#. Copy example files into your microscope folders. Here are some example files 
    for you to download,
    
    a. XL30
@@ -380,7 +404,7 @@ for more details.
 
 Step 6: Apache and mod_wsgi
 ---------------------------
-1. Create a symbolic link from MyTardis to standard ``/var/www/html`` structure 
+#. Create a symbolic link from MyTardis to standard ``/var/www/html`` structure 
    (makes a fixed path for later changes)::
 
       cd /var/www/html
@@ -388,7 +412,7 @@ Step 6: Apache and mod_wsgi
       sudo -u apache ln -s /opt/mytardis mytardis
       chmod o-w /var/www/html
       
-2. Set up a virtual host for MicroTardis web portal by editing 
+#. Set up a virtual host for MicroTardis web portal by editing 
    ``/etc/httpd/conf/httpd.conf`` file::
 
       <VirtualHost *:80>
@@ -406,7 +430,7 @@ Step 6: Apache and mod_wsgi
           </Directory>
       </VirtualHost>
 
-3. Edit ``/etc/httpd/conf.d/wsgi.conf`` file::
+#. Edit ``/etc/httpd/conf.d/wsgi.conf`` file::
 
       LoadModule wsgi_module modules/mod_wsgi.so
       <IfModule mod_wsgi.c>
@@ -414,12 +438,12 @@ Step 6: Apache and mod_wsgi
           Include /var/www/html/mytardis/apache/apache_django_wsgi.conf
       </IfModule>
   
-4. Create ``apache_django_wsgi.conf`` file::
+#. Create ``apache_django_wsgi.conf`` file::
 
       cd /var/www/html/mytardis/apache/
       cp apache_django_wsgi.conf_changeme apache_django_wsgi.conf
 
-5. Edit the ``apache_django_wsgi.conf`` file as shown below::
+#. Edit the ``apache_django_wsgi.conf`` file as shown below::
 
       Alias /static/ /var/www/html/mytardis/static/
       <Directory /var/www/html/mytardis/static/>
@@ -443,12 +467,12 @@ Step 6: Apache and mod_wsgi
       </Directory>
       
 
-6. Create ``django.wsgi`` file::
+#. Create ``django.wsgi`` file::
   
       cd /var/www/html/mytardis/apache/
       cp django.wsgi_changeme django.wsgi
   
-7. Edit the ``django.wsgi`` file with instructions shown below followed by an 
+#. Edit the ``django.wsgi`` file with instructions shown below followed by an 
    example of django.wsgi.
   
    a. Please copy the value of **sys.path** variable from 
@@ -521,20 +545,20 @@ Step 6: Apache and mod_wsgi
         application = django.core.handlers.wsgi.WSGIHandler()
       
 
-8. As root, make all file/directories in mytardis as group *apache* with *rx* 
+#. As root, make all file/directories in mytardis as group *apache* with *rx* 
    access permission::
 
       chgrp apache -R /opt/mytardis
       chmod g+w /opt/mytardis
       chmod g+rx -R /opt/mytardis
       
-9. Set proper file access permission to ``/opt/mytardis/var`` directory::
+#. Set proper file access permission to ``/opt/mytardis/var`` directory::
 
       chmod g+rwx -R /opt/mytardis/var
 
 Step 7: SELinux
 ---------------
-1. Disable SELinux protection in RHEL.
+#. Disable SELinux protection in RHEL.
 
    a. To turn SELinux off immediately, without rebooting use (turning off 
       SELinux temporarily)::
@@ -563,32 +587,32 @@ Step 7: SELinux
 
 Step 8: Firewall Settings
 -------------------------
-1. Open flle ``/etc/sysconfig/iptables``::
+#. Open flle ``/etc/sysconfig/iptables``::
 
       vi /etc/sysconfig/iptables
  
-2. Append rules as follows::
+#. Append rules as follows::
 
       -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
       -A INPUT -m state --state NEW -p tcp --dport 443 -j ACCEPT
  
-3. Save and close the file. 
-4. Restart iptables::
+#. Save and close the file. 
+#. Restart iptables::
 
       /etc/init.d/iptables restart
 
 
 Step 9: MicroTardis Web Portal 
 ------------------------------
-1. Configure Apache to run every time the system starts::
+#. Configure Apache to run every time the system starts::
 
       chkconfig httpd on
       
-2. Test if Apache service is running::
+#. Test if Apache service is running::
 
       service httpd status
      
-3. Start Apache service,
+#. Start Apache service,
 
    a. Simply start Apache service if it's not running::
     
@@ -598,7 +622,7 @@ Step 9: MicroTardis Web Portal
     
         service httpd restart
 
-4. Check if MicroTardis Web Portal is working fine via browser with URL::
+#. Check if MicroTardis Web Portal is working fine via browser with URL::
 
       http://your_hostname.domain_name/
       
