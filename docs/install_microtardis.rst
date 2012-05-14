@@ -118,8 +118,11 @@ Step 4: Download MicroTardis Extensions
       cd /opt/mytardis/tardis
       git clone https://github.com/mytardis/microtardis.git
    
-   The ``microtardis`` directory should be the same level as the 
-   ``tardis_portal`` directory.
+   Please note that it is essential to check out ``microtardis`` source codes 
+   into ``/opt/mytardis/tardis`` directory where the ``tardis_portal`` directory 
+   is. The tardis_portal directory contains main functions of MyTardis. It is
+   necessary for MicroTardis to live in the same location of it to reuse or 
+   override its features.
    
    
 Step 5: Building
@@ -132,12 +135,12 @@ modules and their dependencies inside ``/opt/mytardis`` directory. Please note
 that this is not a system-wide installation. Buildout uses a Python tool called 
 setuptools internally to install the packages. 
    
-#. Run the bootstrap script to bootstrap a buildout-based project::
+#. Run the **bootstrap** script to bootstrap a buildout-based project::
 
       cd /opt/mytardis
       python bootstrap.py
    
-#. Run the buildout script to download and install Python eggs and all 
+#. Run the **buildout** script to download and install Python eggs and all 
    dependencies::
 
       cd /opt/mytardis
@@ -149,7 +152,7 @@ setuptools internally to install the packages.
 Deploying MicroTardis
 =====================
 
-Step 1: MicroTardis settings.py File
+Step 6: MicroTardis settings.py File
 ------------------------------------
 
 Configuring MicroTardis/MyTardis is done through a standard Django *settings.py* 
@@ -165,7 +168,7 @@ includes support to MicroTardis application.
 
       cp /opt/mytardis/tardis/microtardis/settings_microtardis.py /opt/mytardis/tardis/settings.py
 
-#. To configure MicroTardis for interactive use to proceed following part of 
+#. To configure MicroTardis for interactive use to proceed following parts of 
    configuration, please edit the file ``/opt/mytardis/bin/django`` and replace 
    the following line::
 
@@ -180,7 +183,7 @@ includes support to MicroTardis application.
    this command later on to manually create database tables or superuser, and so 
    on.
 
-Step 2: MicroTardis Database
+Step 7: MicroTardis Database
 ----------------------------
 #. Ensure that the MySQL database has been started::
    
@@ -200,9 +203,9 @@ Step 2: MicroTardis Database
 
       mysql -e "GRANT ALL PRIVILEGES ON microtardis.* TO 'microtardisuser'@'localhost' IDENTIFIED BY 'secret';"
    
-#. Edit the ``/opt/mytardis/tardis/settings.py`` file and ensure that 
-   DATABASE_PASSWORD and other database parameters match the values used to 
-   create the MicroTardis database::
+#. Edit the ``/opt/mytardis/tardis/settings.py`` file which you have just 
+   created in former step. Please ensure that the values of database parameters 
+   in settings.py match the values used to create your MicroTardis database::
 
       DATABASES = {}
       DATABASES['default'] = {}
@@ -229,8 +232,9 @@ Step 2: MicroTardis Database
 
       mysqladmin -u root -pcurrentpassword password 'newpassword'
 
-   Please note that there is no space between **-p** and **currentpassword**. Or 
-   change MySQL root password from MySQL prompt using UPDATE SQL command::
+   Please note that there is no space between **-p** and **currentpassword**. Or
+   you can also change MySQL root password from MySQL prompt using UPDATE SQL 
+   command::
 
       mysql> UPDATE user SET password=PASSWORD('newpassword') WHERE user='root';
       mysql> FLUSH PRIVILEGES;
@@ -265,15 +269,17 @@ Step 2: MicroTardis Database
    for more details. 
    
    
-Step 3: MicroTardis Administrator
+Step 8: MicroTardis Administrator
 ---------------------------------
 1. Create an administrator account::
 
       cd /opt/mytardis
       bin/django createsuperuser
 
+   Please keep your user name and password. You will need them to sign in 
+   MicroTardis administrator web interface.
 
-Step 4: Static Files
+Step 9: Static Files
 --------------------
 For performance reasons you should avoid static files being served via the 
 application, and instead serve them directly through the webserver.
@@ -284,102 +290,60 @@ application, and instead serve them directly through the webserver.
       bin/django collectstatic
 
 
-Step 5: MicroTardis Staging Area and Store
-------------------------------------------
+Step 10: MicroTardis Staging Area and Store
+-------------------------------------------
 In MyTardis/MicroTardis, **staging area** is an intermediate data storage area 
 between the sources of raw data and the MyTardis/MicroTardis **data store**.
 It is used for gathering data from different sources that will be ready to 
 ingest into MyTardis/MicroTardis data store at different times. 
 
-With respect to the solution of automatic data collection on staging area, 
-please see an example of `RMIT MicroTardis Data Harvest <http://microtardis.readthedocs.org/en/latest/install_scripts.html>`_ 
-for more details.
+#. Setup MicroTardis staging area and data store   
 
-#. The default location of staging area or data store is in ``mytardis/var``. 
-   If you have followed the installation instructions above, you should be able 
-   to see them:: 
+   The default location of staging area or data store is in ``mytardis/var``. If 
+   you have followed the installation instructions above, you should be able to 
+   see them:: 
 
      ls -dl /opt/mytardis/var/staging
      ls -dl /opt/mytardis/var/store
 
-   and both of them are empty directories.
-   
-#. Specify directory paths of your own staging area and data store if you would 
-   like to change the locations of them instead of using the default ones 
-   (*Optional*).
- 
-   a. Edit your settings.py file, for example::
-   
-        vi /opt/mytardis/tardis/settings.py
-   
-   b. Find the following lines in the settings.py file::
-   
-        #STAGING_PATH = '/directory/path/of/your/own/staging'
-        #FILE_STORE_PATH = '/directory/path/of/your/own/store'
-     
-   c. Uncomment the line and specify the location of your own staging area or 
-      data store.
-
-#. Set up remote staging area and data store (*Optional*).
-
-   If you need to use remote or mounted staging/store area, please create 
-   symbolic links in ``/opt/mytardis/var`` to replace default staging and store
-   directories.
-   
-   a. Create a symbolic link for ``staging`` area from MicroTardis to the remote 
-      storage::
-
-        cd /opt/mytardis/var
-        rmdir staging
-        ln -s /mnt/your_remote_staging staging
-    
-   b. Create a symbolic link for ``store`` from MicroTardis to the remote 
-      storage::
-
-        cd /opt/mytardis/var
-        rmdir store
-        ln -s /mnt/your_remote_store store
-
-#. In MicroTardis, data store is a file storage to keep ingested files with a 
+   You might have noticed that both of them are empty directories. In 
+   MicroTardis, data store is a file storage to keep ingested files with its 
    specific file directory structure. In this part you are not expected to 
    change or modify any data in MicroTardis data store including files and 
    directories.
 
-#. Create **MicroTardis Staging Structure** for data ingestion from staging area 
-   into data store.
-
-   You are required to manually create a **staging structure** with a predefined
-   file directory layout. In MicroTardis staging area, it needs a specific 
-   folder structure inside staging to enable data ingestion and metadata
-   extraction from staging area into data store.
+   However, you are required to manually create a **staging structure** in 
+   MicroTardis staging area. Again, it needs a specific folder structure inside 
+   staging to enable data ingestion from staging area into data store and 
+   metadata extraction using predefined microcope-specific data filters. Please 
+   follow the short instructions below to create the staging area structure for 
+   your deployment.
    
-   a. The first thing to do is to create user folders inside your staging area::
+   a. The first thing to do is to create **user folders** inside your staging 
+      area::
 
         cd /opt/mytardis/var/staging
         mkdir your_username
       
       You can use the administrator account that you've just created.
       
-   b. Then create folders for microscope instruments inside user folders.
-      MicroTardis supports 3 different microscopes so far,
-   
-      * Philips XL30 SEM (1999) with Oxford Si(Li) X-ray detector and HKL EDSD system
-      * FEI Nova NanoSEM (2007) with EDAX Si(Li) X-ray detector
-      * FEI Quanta 200 ESEM with EDAX Si(Li) X-ray detector and Gatan Alto Cyro stage 
-   
-      Please name your microscope folders as below,
-      
-      * XL30
-      * NovaNanoSEM
-      * Quanta200  
-
-      For example::
+   b. Then create **microscope folders** inside user folders with any name of 
+      microscope which is currently supported in MicroTardis: XL30, NovaNanoSEM,
+      and Quanta200. For example::
       
         cd /opt/mytardis/var/staging/your_username
         mkdir NovaNanoSEM
-
+      
+   MicroTardis currently only supports the following microscopes,
+   
+      * Philips XL30 SEM (1999) with Oxford Si(Li) X-ray detector and HKL EDSD 
+        system
+      * FEI Nova NanoSEM (2007) with EDAX Si(Li) X-ray detector
+      * FEI Quanta 200 ESEM with EDAX Si(Li) X-ray detector and Gatan Alto Cyro 
+        stage 
+      
 #. Copy example files into your microscope folders. Here are some example files 
-   for you to download,
+   for you to download for the purpose of testing,
    
    a. XL30
    
@@ -399,11 +363,52 @@ for more details.
 
    Download them into microscope folders according to different microscopes. 
    Then you will be able to see the folders/files you've just created/downloaded
-   on *MicroTardis Create Experiment* web interface.
+   on *MicroTardis Create Experiment* web interface later after you successfully 
+   start your deployment server.
+   
+#. (OPTIONAL) Specify directory paths of your own staging area and data store if 
+   you would clike to change the locations of them instead of using the default 
+   ones.
+ 
+   a. Edit your settings.py file, for example::
+   
+        vi /opt/mytardis/tardis/settings.py
+   
+   b. Find the following lines in the settings.py file::
+   
+        #STAGING_PATH = '/directory/path/of/your/own/staging'
+        #FILE_STORE_PATH = '/directory/path/of/your/own/store'
+     
+   c. Uncomment the line and specify the real location of your own staging area 
+      or data store.
 
+#. (OPTIONAL) Set up remote staging area and data store.
 
-Step 6: Apache and mod_wsgi
----------------------------
+   If you need to use remote or mounted staging/store area, please create 
+   symbolic links in ``/opt/mytardis/var`` to replace default staging and store
+   directories.
+   
+   a. Create a symbolic link for ``staging`` area from MicroTardis to the remote 
+      storage::
+
+        cd /opt/mytardis/var
+        rmdir staging
+        ln -s /mnt/your_remote_staging staging
+    
+   b. Create a symbolic link for data ``store`` from MicroTardis to the remote 
+      storage::
+
+        cd /opt/mytardis/var
+        rmdir store
+        ln -s /mnt/your_remote_store store
+
+#. (OPTIONAL) With respect to automatic data collection on staging area which 
+   automatically harvests data from data sources into staging area, please see 
+   an example of `RMIT MicroTardis Data Harvest <http://microtardis.readthedocs.org/en/latest/install_autoingest_at_rmmf.html>`_ 
+   for more details.
+
+Step 11: Apache and mod_wsgi
+----------------------------
 #. Create a symbolic link from MyTardis to standard ``/var/www/html`` structure 
    (makes a fixed path for later changes)::
 
@@ -483,11 +488,8 @@ Step 6: Apache and mod_wsgi
       ``django.wsgi`` file::
    
         sys.path.append('/Users/steve/django-jython-svn/myTARDIS_checkout')
-      
-   c. Also change the value of DJANGO_SETTINGS_MODULE environment variable so 
-      that it points to your project’s settings.py file if necessary.
    
-   d. Example::
+   c. Example::
    
         #!/usr/bin/python
       
@@ -544,20 +546,31 @@ Step 6: Apache and mod_wsgi
         import django.core.handlers.wsgi
         application = django.core.handlers.wsgi.WSGIHandler()
       
+Step 12: Permission Settings
+----------------------------
+MicroTardis is a Python web application. The web server (i.e. Apache) needs to 
+have permissions to access the WSGI script in the directory of MicroTardis, or 
+write log files or data into it. The following commands will give apache user to
+do this.
 
 #. As root, make all file/directories in mytardis as group *apache* with *rx* 
    access permission::
 
       chgrp apache -R /opt/mytardis
-      chmod g+w /opt/mytardis
       chmod g+rx -R /opt/mytardis
+     
+#. Enable apache to write log files into the default directory::
+
+      chmod g+w /opt/mytardis     
       
-#. Set proper file access permission to ``/opt/mytardis/var`` directory::
+#. Set proper file access permission to ``/opt/mytardis/var`` directory to make
+   Apache able to write data in data store::
 
       chmod g+rwx -R /opt/mytardis/var
 
-Step 7: SELinux
----------------
+
+Step 13: SELinux
+----------------
 #. Disable SELinux protection in RHEL.
 
    a. To turn SELinux off immediately, without rebooting use (turning off 
@@ -585,8 +598,8 @@ Step 7: SELinux
       Save the file, then you will need to reboot your system to create the 
       desired effect. 
 
-Step 8: Firewall Settings
--------------------------
+Step 14: Firewall Settings
+--------------------------
 #. Open flle ``/etc/sysconfig/iptables``::
 
       vi /etc/sysconfig/iptables
@@ -602,8 +615,8 @@ Step 8: Firewall Settings
       /etc/init.d/iptables restart
 
 
-Step 9: MicroTardis Web Portal 
-------------------------------
+Step 15: MicroTardis Web Portal 
+-------------------------------
 #. Configure Apache to run every time the system starts::
 
       chkconfig httpd on

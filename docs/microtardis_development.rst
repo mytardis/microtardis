@@ -118,8 +118,11 @@ Setup Local Development Environment
       cd ~/mytardis/tardis
       git clone https://github.com/mytardis/microtardis.git
       
-     The ``microtardis`` directory should be the same level as the 
-     ``tardis_portal`` directory.
+     Please note that it is essential to check out ``microtardis`` source codes 
+     into ``/opt/mytardis/tardis`` directory where the ``tardis_portal`` 
+     directory is. The tardis_portal directory contains main functions of 
+     MyTardis. It is necessary for MicroTardis to live in the same location of 
+     it to reuse or override its features.
      
 #. Use Buildout to set up a development environment 
       
@@ -131,12 +134,12 @@ Setup Local Development Environment
    system-wide installation. Buildout uses a Python tool called setuptools 
    internally to install the packages. 
    
-   * Run the bootstrap script to bootstrap a buildout-based project::
+   * Run the **bootstrap** script to bootstrap a buildout-based project::
    
       cd ~/mytardis
       python bootstrap.py
       
-   * Run the buildout script to download and install Python eggs and all 
+   * Run the **buildout** script to download and install Python eggs and all 
      dependencies::
       
       cd ~/mytardis
@@ -160,7 +163,7 @@ Setup Local Development Environment
 
       cp ~/mytardis/tardis/microtardis/settings_microtardis.py ~/mytardis/tardis/settings.py
 
-#. To configure MicroTardis for interactive use to proceed following part of
+#. To configure MicroTardis for interactive use to proceed following parts of
    configuration, please edit the file ``~/mytardis/bin/django`` and replace the
    following line::
 
@@ -176,7 +179,8 @@ Setup Local Development Environment
    on.
 
 #. To configure database for development purpose, edit the database settings 
-   in ``~/mytardis/tardis/settings.py`` file as shown below::
+   in ``~/mytardis/tardis/settings.py`` file which you have just created as 
+   shown below::
 
       DATABASES = {}
       DATABASES['default'] = {}
@@ -206,6 +210,9 @@ Setup Local Development Environment
     
       cd ~/mytardis
       bin/django createsuperuser
+      
+   Please keep your user name and password. You will need them to sign in 
+   MicroTardis administrator web interface.
     
 #. Setup MicroTardis staging area and data store
 
@@ -216,54 +223,51 @@ Setup Local Development Environment
    times. 
 
 
-   The default location of staging area or data store is in ``mytardis/var``. 
-   If you have followed the installation instructions above, you should be able 
-   to see them:: 
+   The default location of staging area or data store is in ``mytardis/var``. If 
+   you have followed the installation instructions above, you should be able to 
+   see them:: 
 
      ls -dl ~/mytardis/var/staging
      ls -dl ~/mytardis/var/store
    
    You might have noticed that both of them are empty directories. In 
-   MicroTardis, data store is a file storage to keep ingested files with a 
+   MicroTardis, data store is a file storage to keep ingested files with it 
    specific file directory structure. In this part you are not expected to 
    change or modify any data in MicroTardis data store including files and 
    directories.
    
-   However, you are required to manually create a **staging structure** with 
-   a predefined file directory layout. In MicroTardis staging area, it needs a 
-   specific folder structure inside staging to enable data ingestion and 
-   metadata extraction from staging area into data store. Please follow the 
-   short instructions below to create the staging area structure.
+   However, you are required to manually create a **staging structure** in
+   MicroTardis staging area. Again, it needs a specific folder structure inside 
+   staging to enable data ingestion from staging area into data store and 
+   metadata extraction using predefined microcope-specific data filters. Please 
+   follow the short instructions below to create the staging area structure for 
+   your deployment.
    
-   a. The first thing to do is to create user folders inside your staging area::
+   a. The first thing to do is to create **user folders** inside your staging 
+      area::
 
         cd ~/mytardis/var/staging
         mkdir your_username
       
       You can use the administrator account that you've just created.
       
-   b. Then create folders for microscope instruments inside user folders. 
-      MicroTardis supports 3 different microscopes so far,
-   
-      * Philips XL30 SEM (1999) with Oxford Si(Li) X-ray detector and HKL EDSD 
-        system
-      * FEI Nova NanoSEM (2007) with EDAX Si(Li)　X-ray detector
-      * FEI Quanta 200 ESEM with EDAX Si(Li) X-ray detector and Gatan Alto Cyro 
-        stage 
-   
-      Please name your microscope folders as below,
-      
-      * XL30
-      * NovaNanoSEM
-      * Quanta200  
-
-      For example::
+   b. Then create **microscope folders** inside user folders with any name of 
+      microscope which is currently supported in MicroTardis: XL30, NovaNanoSEM,
+      and Quanta200. For example::
       
         cd ~/mytardis/var/staging/your_username
         mkdir NovaNanoSEM
+      
+   MicroTardis currently only supports the following microscopes,
+   
+      * Philips XL30 SEM (1999) with Oxford Si(Li) X-ray detector and HKL EDSD 
+        system
+      * FEI Nova NanoSEM (2007) with EDAX Si(Li) X-ray detector
+      * FEI Quanta 200 ESEM with EDAX Si(Li) X-ray detector and Gatan Alto Cyro 
+        stage 
 
-#. Copy microscope example files into your microscope folders. Here are some 
-   example files for you to download,
+#. Copy example files into your microscope folders. Here are some example files 
+   for you to download for the purpose of testing,
    
    a. XL30
    
