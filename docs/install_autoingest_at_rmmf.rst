@@ -9,21 +9,52 @@ Setting up autoingest functionality at RMMF
  4. Atom ingest installed and configured on MicroTardis machine. (As of writing, this has only been done on microtardis-test.eres.rmit.edu.au)
  
 1. Installing DeltaCopy
------------------------
+=======================
 Straightforward. Download, install. It's free. Make it run as a service all the time. Make a note of the IP address and 
 name of shared folder.
  
 2. Installing harvest scripts
------------------------------
-TODO - they're not currently in any VCS.
+=============================
+.. highlight: bash
+
+The scripts are simply bash scripts that use rsync to copy files over from the three support PCs. They should be triggered by a cron job.
+
+    cd /usr/local
+    git clone https://github.com/stevage/MicroTardis-Harvest    
+     
+To configure which individual machines to harvest from and where to store data to, modify the scripts - they are commented.  
  
- 
-3. Install atom dataset provider
---------------------------------
-TODO
+3. Install atom dataset provider.
+=================================
+The Atom dataset provider is a server which, when requested, scans the staging area directories and provides a list of the most
+recent files as an Atom feed, so they can be ingested into Tardis. 
+
+Get the source code here: https://github.com/stevage/atom-dataset-provider
+
+It is installed on the Harvest machine in `/usr/local/microtardis/atom-dataset-provider`.
+
+Use this script to start it:
+
+    #!/bin/bash
+    # /usr/local/microtardis/atom-dataset-provider/provider.sh
+    bash -x ./kill-provider.sh
+    set -x
+    LOG=`pwd`/../logs/atom-dataset-provider.log
+    PATTERN='([EeSs][0-9]+)'
+    EXCLUDEPATTERN='[Tt]humbs.db|e80940/.*/Old\ Data/'
+    GROUPPATTERN='/^('"${STAGING}${PATTERN}"'/[^/]+/[^/]+/[^/]+/).+$/'
+    PATH=/usr/local/microtardis/local/bin:$PATH
+    STAGING=/mnt/np_staging/
+    nohup `pwd`/bin/atom-dataset-provider -d "$STAGING"  --group-pattern "$GROUPPATTERN" --exclude-pattern "$EXCLUDEPATTERN" >> $LOG &
+
+The variables `GROUPPATTERN`, `PATTERN` and `EXCLUDEPATTERN` are regular expressions which define which files and folders are included on the 
+atom feed, and how folders are grouped as datasets.
+
+By default, it runs on port 4000. On the datapuller machine, Apache must be configured to forward "http://datapuller.isis.rmit.edu.au/atom"
+to local port 4000.
 
 4. Install atom ingest 
-----------------------
+======================
 .. highlight: bash
 
 Atom ingest is a Django "app" that is installed inside MyTardis. It has no user interface, but runs in the background to periodically
