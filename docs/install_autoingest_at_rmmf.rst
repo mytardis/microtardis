@@ -9,12 +9,12 @@ Setting up autoingest functionality at RMMF
  4. Atom ingest installed and configured on MicroTardis machine. (As of writing, this has only been done on microtardis-test.eres.rmit.edu.au)
  
 1. Installing DeltaCopy
-=======================
+-----------------------
 Straightforward. Download, install. It's free. Make it run as a service all the time. Make a note of the IP address and 
 name of shared folder.
  
 2. Installing harvest scripts
-=============================
+-----------------------------
 .. highlight: bash
 
 The scripts are simply bash scripts that use rsync to copy files over from the three support PCs. They should be triggered by a cron job.
@@ -24,8 +24,8 @@ The scripts are simply bash scripts that use rsync to copy files over from the t
      
 To configure which individual machines to harvest from and where to store data to, modify the scripts - they are commented.  
  
-3. Install atom dataset provider.
-=================================
+3. Install atom dataset provider
+--------------------------------
 The Atom dataset provider is a server which, when requested, scans the staging area directories and provides a list of the most
 recent files as an Atom feed, so they can be ingested into Tardis. 
 
@@ -54,7 +54,7 @@ By default, it runs on port 4000. On the datapuller machine, Apache must be conf
 to local port 4000.
 
 4. Install atom ingest 
-======================
+----------------------
 .. highlight: bash
 
 Atom ingest is a Django "app" that is installed inside MyTardis. It has no user interface, but runs in the background to periodically
