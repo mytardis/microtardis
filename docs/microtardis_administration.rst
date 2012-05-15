@@ -3,15 +3,26 @@ MicroTardis Administration Guide
 
 Create New Users
 ----------------
-MicroTardis is integrated with 
-`RMMF Booking System (EMBS) <http://embs.set.rmit.edu.au/mebookings.php>`_ 
-authentication module that automatically creates new user accounts for RMMF 
-users when they first login to MicroTardis web interface using the same username
-and password in EMBS.
+MicroTardis has two authentication methods. One is **local** user authentication 
+which is the preferred solution using a local authentication database. In this 
+case, site administrator is required to perform user account maintenance and 
+validation tasks. For each valid user, site administrator has to manually create
+a user account with a username and a password and grant this user proper 
+privileges to register this user in MicroTardis.
 
-However, MicroTardis allows site administrator to manually create user account
-as well via MicroTardis administration interface. The following steps will show 
-you how to do it.
+The other method is **integrated** user authentication with 
+`RMMF Booking System (EMBS) <http://embs.set.rmit.edu.au/mebookings.php>`_ which
+uses a remote RMMF authentication database. MicroTardis site administrator is 
+not required to maintain user accounts in MicroTardis database in this case. It
+automatically creates a new user account in MicroTardis local authentication 
+database when a valid RMMF user (who has registered as an user in EMBS) first 
+log in MicroTardis with a valid username and a valid password. In this case, the
+first login is considered as user registration in MicroTardis. After successful 
+registration, MicroTardis would only use local authentication database to 
+authenticate users. There won't be communication between MicroTardis and EMBS
+for user authentication if the user account already exists in MicroTardis 
+database.
+
 
 Sign in MicroTardis Administration Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
