@@ -1,4 +1,4 @@
-Setting up autoingest functionality at RMMF
+Setting up automatic ingesting at RMMF
 ===========================================
 
  In order for MicroTardis to automatically harvest user data from support PCs at RMMF, four things are required:
@@ -128,7 +128,7 @@ may need to be turned off - it is useful for importing large amounts of data ini
     
 Next, configure the CeleryD tasks that fire the auto ingest. CeleryD is a scheduling mechanism used by MyTardis.
 
-If the file ``atom/settings_microtardis.py`` doesn't exist, create it. Make its contents as follows::
+If the file ``atom/settings_atom.py`` doesn't exist, create it. Make its contents as follows::
 
     # Settings to ensure atom ingest is triggered by celery.
     import djcelery
