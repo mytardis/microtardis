@@ -86,46 +86,47 @@ Module names with hyphens cause problems for Python, so we rename it::
 The Atom ingest app can be configured with many different policies for user creation, experiment creation etc. Edit the
 file ``atom/options.py``. These are the settings we currently use::
 
-
-    # Names of parameters, must match fixture entries.
-    # Some are also used for <category> processing in the feed itself.
-    PARAM_ENTRY_ID = 'EntryID'
-    PARAM_EXPERIMENT_ID = 'ExperimentID'
-    PARAM_UPDATED = 'Updated'
-    PARAM_EXPERIMENT_TITLE = 'ExperimentTitle'
+    class IngestOptions:
     
-    ALLOW_EXPERIMENT_CREATION = True         # Should we create new experiments
-    ALLOW_EXPERIMENT_TITLE_MATCHING = True   # If there's no id, is the title enough to match on
-    ALLOW_UNIDENTIFIED_EXPERIMENT = False    # If there's no title/id, should we process it as "uncategorized"?
-    DEFAULT_UNIDENTIFIED_EXPERIMENT_TITLE="Uncategorized Data"
-    ALLOW_UNNAMED_DATASETS = True            # If a dataset has no title, should we ingest it with a default name
-    DEFAULT_UNNAMED_DATASET_TITLE = '(assorted files)'
-    ALLOW_USER_CREATION = False              # If experiments belong to unknown users, create them?
-    # Can existing datasets be updated? If not, we ignore updates. To cause a new dataset to be created, the incoming
-    # feed must have a unique EntryID for the dataset (eg, hash of its contents).
-    ALLOW_UPDATING_DATASETS = True
-    # If a datafile is modified, do we re-harvest it (creating two copies)? Else, we ignore the update. False is not recommended.
-    ALLOW_UPDATING_DATAFILES = True                     
-    HIDE_REPLACED_DATAFILES = True 
-    # If files are served as /user/instrument/experiment/dataset/datafile.tif
-    # then 'datafile.tif' is at depth 5. This is so we can maintain directory structure that
-    # is significant within a dataset. Set to -1 to assume the deepest directory.
-
-    DATAFILE_DIRECTORY_DEPTH = 7 # /mnt/rmmf_staging/e123/NovaNanoSEM/exp1/ds1/test3.tif
-
-    # Yes, we want to extract metadata from ingested files.
-    USE_MIDDLEWARE_FILTERS = True
-
-    # If we can transfer files "locally" (ie, via SMB mount), then replace URL_BASE_TO_REPLACE with LOCAL_SOURCE_PATH
-    # to construct a file path that can be copied from. 
-    USE_LOCAL_TRANSFERS = True
-    URL_BASE_TO_REPLACE = "http://datapuller.isis.rmit.edu.au/"
-    LOCAL_SOURCE_PATH = "/mnt/rmmf_staging/"
-
-    # Should we always examine every dataset entry in the feed, even after encountering "old" entries?
-    ALWAYS_PROCESS_FULL_FEED = False
-
-    HTTP_PROXY = "http://bproxy.rmit.edu.au:8080"
+        # Names of parameters, must match fixture entries.
+        # Some are also used for <category> processing in the feed itself.
+        PARAM_ENTRY_ID = 'EntryID'
+        PARAM_EXPERIMENT_ID = 'ExperimentID'
+        PARAM_UPDATED = 'Updated'
+        PARAM_EXPERIMENT_TITLE = 'ExperimentTitle'
+        
+        ALLOW_EXPERIMENT_CREATION = True         # Should we create new experiments
+        ALLOW_EXPERIMENT_TITLE_MATCHING = True   # If there's no id, is the title enough to match on
+        ALLOW_UNIDENTIFIED_EXPERIMENT = False    # If there's no title/id, should we process it as "uncategorized"?
+        DEFAULT_UNIDENTIFIED_EXPERIMENT_TITLE="Uncategorized Data"
+        ALLOW_UNNAMED_DATASETS = True            # If a dataset has no title, should we ingest it with a default name
+        DEFAULT_UNNAMED_DATASET_TITLE = '(assorted files)'
+        ALLOW_USER_CREATION = False              # If experiments belong to unknown users, create them?
+        # Can existing datasets be updated? If not, we ignore updates. To cause a new dataset to be created, the incoming
+        # feed must have a unique EntryID for the dataset (eg, hash of its contents).
+        ALLOW_UPDATING_DATASETS = True
+        # If a datafile is modified, do we re-harvest it (creating two copies)? Else, we ignore the update. False is not recommended.
+        ALLOW_UPDATING_DATAFILES = True                     
+        HIDE_REPLACED_DATAFILES = True 
+        # If files are served as /user/instrument/experiment/dataset/datafile.tif
+        # then 'datafile.tif' is at depth 5. This is so we can maintain directory structure that
+        # is significant within a dataset. Set to -1 to assume the deepest directory.
+    
+        DATAFILE_DIRECTORY_DEPTH = 7 # /mnt/rmmf_staging/e123/NovaNanoSEM/exp1/ds1/test3.tif
+    
+        # Yes, we want to extract metadata from ingested files.
+        USE_MIDDLEWARE_FILTERS = True
+    
+        # If we can transfer files "locally" (ie, via SMB mount), then replace URL_BASE_TO_REPLACE with LOCAL_SOURCE_PATH
+        # to construct a file path that can be copied from. 
+        USE_LOCAL_TRANSFERS = True
+        URL_BASE_TO_REPLACE = "http://datapuller.isis.rmit.edu.au/"
+        LOCAL_SOURCE_PATH = "/mnt/rmmf_staging/"
+    
+        # Should we always examine every dataset entry in the feed, even after encountering "old" entries?
+        ALWAYS_PROCESS_FULL_FEED = False
+    
+        HTTP_PROXY = "http://bproxy.rmit.edu.au:8080"
 
 It is likely these will need to be changed as requirements change. In particular, ALLOW_EXPERIMENT_CREATION 
 may need to be turned off - it is useful for importing large amounts of data initially.
