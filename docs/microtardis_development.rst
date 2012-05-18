@@ -50,7 +50,9 @@ Software Repositories
 
    b. MicroTardis software repository
 
-      The software can be checked out with the following command::
+      If you have write access to MicroTardis github repository, use the command
+      below with your own username instead to check out MicroTardis source 
+      codes::
 
         git clone https://username@github.com/mytardis/microtardis.git
 
@@ -58,7 +60,7 @@ Software Repositories
 
         git clone https://github.com/mytardis/microtardis.git
 
-Setup Local Development Environment
+Local Development Environment Setup
 -----------------------------------
 
 #. Internet Proxy Settings if Within RMIT Network
@@ -103,7 +105,7 @@ Setup Local Development Environment
       easy_install PIL
       
    
-#. Download MyTardis Source code
+#. Download MyTardis source code
 
    * Choose a folder to install MyTardis. For example, your home directory.
    * Check out latest version of MyTardis Source Code::
@@ -111,7 +113,7 @@ Setup Local Development Environment
       cd ~
       git clone https://github.com/mytardis/mytardis.git
 
-#. Download MicroTardis Extensions
+#. Download MicroTardis extensions
    
    * Check out latest version of MicroTardis Extensions::
    
@@ -124,7 +126,7 @@ Setup Local Development Environment
      MyTardis. It is necessary for MicroTardis to live in the same location of 
      it to reuse or override its features.
      
-#. Use Buildout to set up a development environment 
+#. Use **Buildout** to set up a development environment 
       
    MicroTardis/MyTardis uses the Buildout Python-based build system to 
    automatically create, assemble and deploy applications or modules required 
@@ -386,13 +388,12 @@ User Registration
 -----------------
 
 MicroTardis has two authentication methods. One is **local** user authentication 
-which is the preferred solution using a local authentication database. In this 
+which is the default solution using a local authentication database. In this 
 case, site administrator is required to perform user account maintenance and 
 validation tasks. For each valid user, site administrator has to manually create
 a user account with a username and a password and grant this user proper 
-privileges to register this user in MicroTardis. For a quick guide to create
-user account, please see
-`MicroTardis Administration Guide <http://readthedocs.org/docs/microtardis/en/latest/microtardis_administration.html>`_.
+privileges to register he/she in MicroTardis. For a quick guide to create user 
+account, please see `MicroTardis Administration Guide <http://readthedocs.org/docs/microtardis/en/latest/microtardis_administration.html>`_.
 
 The other method is **integrated** user authentication with 
 `RMMF Booking System (EMBS) <http://embs.set.rmit.edu.au/mebookings.php>`_ which
