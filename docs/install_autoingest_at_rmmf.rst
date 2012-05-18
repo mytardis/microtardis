@@ -33,7 +33,7 @@ Get the source code here: https://github.com/stevage/atom-dataset-provider
 
 It is installed on the Harvest machine in `/usr/local/microtardis/atom-dataset-provider`.
 
-Use this script to start it:
+Use this script to start it::
 
     #!/bin/bash
     # /usr/local/microtardis/atom-dataset-provider/provider.sh
@@ -153,9 +153,9 @@ If the file ``atom/settings_atom.py`` doesn't exist, create it. Make its content
     CELERYD_CONCURRENCY = 1 
     djcelery.setup_loader()
 
-Now, install the app into MyTardis. In ``/opt/mytardis/tardis/settings.py``, find the line ``"INSTALLED_APPS = ("tardis.microtardis",) + INSTALLED_APPS"`` 
-and add this below it:: 
- 
+Now, install the app into MyTardis. In ``/opt/mytardis/tardis/settings.py``, find the line ``"INSTALLED_APPS = ("tardis.microtardis",) + INSTALLED_APPS"``. Add two lines as follows::
+  
+    INSTALLED_APPS = ("tardis.microtardis",) + INSTALLED_APPS
     INSTALLED_APPS = ("tardis.apps.atom",) + INSTALLED_APPS
     from tardis.apps.atom.settings_atom import *
         
