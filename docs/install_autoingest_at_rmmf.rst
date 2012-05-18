@@ -55,6 +55,10 @@ to local port 4000.
 
 4. Install atom ingest 
 ----------------------
+.. note::
+
+Two scripts described here (``auto_ingest.sh`` and ``killcelery.sh``) require sudo privileges. It is probably possible to find an alternative way to install that doesn't require sudo.
+
 .. highlight: bash
 
 Atom ingest is a Django "app" that is installed inside MyTardis. It has no user interface, but runs in the background to periodically
