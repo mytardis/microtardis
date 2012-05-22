@@ -17,7 +17,7 @@ name of shared folder.
 -----------------------------
 .. highlight: bash
 
-The scripts are simply bash scripts that use rsync to copy files over from the three support PCs. They should be triggered by a cron job.
+The scripts are simply bash scripts that use rsync to copy files over from the three support PCs. They should be triggered by a cron job::
 
     cd /usr/local
     git clone https://github.com/stevage/MicroTardis-Harvest    
@@ -190,3 +190,25 @@ And of course::
 To start the autoingest:: 
 
     ./autoingest.sh ; tail -f autoingest.log    
+
+
+Troubleshooting
+---------------
+If you get errors of this type::
+
+    ... 
+    File "/opt/mytardis/tardis/apps/atom/atom_ingest.py", line 16, in <module>
+      from tardis.tardis_portal.util import get_local_time, get_utc_time, get_local_time_naive
+    ImportError: cannot import name get_local_time_naive
+
+You need to install some bug fixes to the MyTardis code::
+
+    $ cd /opt/mytardis/tardis
+    $ git remote add steve https://stevage@github.com/stevage/mytardis-ruggedisation.git
+    $ git fetch steve 
+    
+(If a password is requested, press enter.)::    
+    
+    $ git merge steve/atom-ingest-fixes
+
+ 
