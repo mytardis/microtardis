@@ -213,6 +213,9 @@ def login(request):
         try:
             response = urllib2.urlopen(embs_url).read()
             if response.status() == 200:
+            # succeeded authentication
+            
+# dummy data testing start            
 #            dummy_status = 200
 #            dummy_json = """
 #{"user_id":       "1",
@@ -226,8 +229,24 @@ def login(request):
 # "user_type":     "student",
 # "user_category": "student" } """
 #            if dummy_status == 200:
-                # succeeded authentication
-                # create new user and userprofile into mytardis localdb
+# dummy data testing end         
+                
+                embs_user_group_name = settings.EMBS_USER_GROUP_NAME
+                try:
+                    # check existence of default user group
+                    group = Group.objects.get(name=embs_user_group_name)
+                except Group.DoesNotExist:
+                    # create a new group if it doesn't exist
+                    group = Group(name=embs_user_group_name)
+                    group.save()
+                    # add basic permissions to the group
+                    group.permissions.add(Permission.objects.get(codename='add_experiment'),
+                                          Permission.objects.get(codename='change_experiment'),
+                                          Permission.objects.get(codename='change_experimentacl'),
+                                          Permission.objects.get(codename='change_userauthentication'))
+                    group.save()
+                
+                # create new user
                 user_json = json.loads(response.read())
 #                user_json = json.loads(dummy_json)
                 email = user_json['email']
@@ -238,22 +257,29 @@ def login(request):
                                                 email=email)
                 user.first_name = first_name
                 user.last_name = last_name
-                user.user_permissions.add(Permission.objects.get(codename='add_experiment'))
-                user.user_permissions.add(Permission.objects.get(codename='change_experiment'))
-                user.user_permissions.add(Permission.objects.get(codename='change_experimentacl'))
-                user.user_permissions.add(Permission.objects.get(codename='change_group'))
-                user.user_permissions.add(Permission.objects.get(codename='change_userauthentication'))
+                
+                # assign the user to the default user group
+                user.groups.add(group)
+                
+                #user.user_permissions.add(Permission.objects.get(codename='add_experiment'))
+                #user.user_permissions.add(Permission.objects.get(codename='change_experiment'))
+                #user.user_permissions.add(Permission.objects.get(codename='change_experimentacl'))
+                #user.user_permissions.add(Permission.objects.get(codename='change_group'))
+                #user.user_permissions.add(Permission.objects.get(codename='change_userauthentication'))
+                
                 user.save()
 
-                userProfile = UserProfile(user=user, isDjangoAccount=False)
+                # create new user profile
+                userProfile = UserProfile(user=user, isDjangoAccount=True)
                 userProfile.save()
-            
+                
+                # create new user authentication
                 userAuth = UserAuthentication(userProfile=userProfile,
                                               username=username, 
                                               authenticationMethod=authMethod)
                 userAuth.save()
                 
-                # log in with valid user
+                # log the valid user in
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 tardis_login(request, user)
                 return HttpResponseRedirect(next)

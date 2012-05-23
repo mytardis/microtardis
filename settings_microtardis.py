@@ -95,8 +95,9 @@ GET_FULL_STAGING_PATH_TEST = path.join(STAGING_PATH, "test_user")
 # Filter middleware for auto-ingest
 FILTER_MIDDLEWARE = (("tardis.microtardis.filters","FilterInitMiddleware"),)
 
-# URL for EMBS authentication
+# URLs for EMBS authentication
 EMBS_URL = "http://embs.rmit.edu.au/auth.php?"
+EMBS_USER_GROUP_NAME = "embs_users_basic_permissions"
 
 # Staging Area and Data Store
 #STAGING_PATH = '/directory/path/of/your/own/staging'
